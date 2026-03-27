@@ -17,7 +17,7 @@ function App() {
         <Titlebar />
         <BrowserRouter>
           <Layout>
-            <Toaster position="bottom-right" richColors />
+            <Toaster position="bottom-center" richColors offset={50} />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/empty" element={<Empty />} />

@@ -1,5 +1,6 @@
 import { Github, ExternalLink } from 'lucide-react';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { VersionDisplay } from '@/features/updater/version-display';
 
 export function Footer() {
   const openLink = async (url: string) => {
@@ -7,9 +8,11 @@ export function Footer() {
   };
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 h-8 flex items-center justify-center gap-4 bg-background backdrop-blur-sm border-t border-muted-foreground/30 text-xs text-muted-foreground z-[9998]">
+    <footer className="fixed bottom-0 left-0 right-0 h-8 flex items-center justify-center gap-4 bg-background backdrop-blur-sm border-t border-muted-foreground/30 text-xs text-muted-foreground z-9998">
+      <VersionDisplay />
+      <span className="text-muted-foreground/50">•</span>
       <a
-        href="https://github.com/mewisme/tauri-template"
+        href="https://github.com/mewisme/cfm"
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-1.5 hover:text-foreground transition-colors"

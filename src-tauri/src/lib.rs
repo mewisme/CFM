@@ -1,114 +1,111 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-use std::sync::Mutex;
-use tauri::{Emitter, Manager};
+use std::sync::Arc;
 
-// Global state to store the opened file path
-struct OpenedFilePath(Mutex<Option<String>>);
+use tauri::menu::{MenuBuilder, MenuItemBuilder};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri::Manager;
+use tauri_plugin_sql::{Migration, MigrationKind};
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
-#[tauri::command]
-fn get_opened_file_path(state: tauri::State<OpenedFilePath>) -> Option<String> {
-    state.0.lock().unwrap().clone()
-}
-
-#[tauri::command]
-fn toggle_devtools(app: tauri::AppHandle) {
-    if let Some(window) = app.get_webview_window("main") {
-        if window.is_devtools_open() {
-            let _ = window.close_devtools();
-        } else {
-            let _ = window.open_devtools();
-        }
-    }
-}
-
-#[tauri::command]
-fn open_devtools(app: tauri::AppHandle) {
-    if let Some(window) = app.get_webview_window("main") {
-        let _ = window.open_devtools();
-    }
-}
-
-#[tauri::command]
-fn close_devtools(app: tauri::AppHandle) {
-    if let Some(window) = app.get_webview_window("main") {
-        let _ = window.close_devtools();
-    }
-}
-
+mod app;
 mod commands;
+mod domain;
+mod process;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let migrations = vec![
+        Migration {
+            version: 1,
+            description: "create_access_entries",
+            sql: "CREATE TABLE IF NOT EXISTS access_entries (id TEXT PRIMARY KEY, name TEXT NOT NULL, access_type TEXT NOT NULL, hostname TEXT NOT NULL, target TEXT NOT NULL, autostart INTEGER NOT NULL DEFAULT 0, restart_policy TEXT NOT NULL, enabled INTEGER NOT NULL DEFAULT 1, tray_pinned INTEGER NOT NULL DEFAULT 0, notes TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);",
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "create_app_settings",
+            sql: "CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);",
+            kind: MigrationKind::Up,
+        },
+    ];
+
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_autostart::Builder::new().build())
+        .plugin(
+            tauri_plugin_sql::Builder::new()
+                .add_migrations("sqlite:cfm.sqlite3", migrations)
+                .build(),
+        )
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_notification::init())
         .setup(|app| {
-            // Capture CLI arguments to check if a file was opened
-            let args: Vec<String> = std::env::args().collect();
-            let opened_file = if args.len() > 1 {
-                // The file path is typically the second argument (first is the executable)
-                let file_path = args[1].clone();
-                // Check if it's a .ts or .tsx file
-                if file_path.ends_with(".ts") || file_path.ends_with(".tsx") {
-                    Some(file_path.clone())
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
+            let supervisor = Arc::new(process::supervisor::ProcessSupervisor::new(
+                app.handle().clone(),
+            ));
+            let service = Arc::new(app::service::CfmService::new(supervisor));
+            app.manage(commands::cfm::AppState { service });
 
-            // Store the opened file path in app state
-            app.manage(OpenedFilePath(Mutex::new(opened_file.clone())));
+            let show_item = MenuItemBuilder::with_id("tray_show", "Show/Hide").build(app)?;
+            let quit_item = MenuItemBuilder::with_id("tray_quit", "Quit").build(app)?;
+            let menu = MenuBuilder::new(app)
+                .items(&[&show_item, &quit_item])
+                .build()?;
 
-            // Emit event to frontend if a file was opened
-            if let Some(file_path) = opened_file {
-                let window = app
-                    .get_webview_window("main")
-                    .expect("Failed to get main window");
-                let _ = window.emit("file-opened", file_path);
-            }
+            TrayIconBuilder::new()
+                .icon(app.default_window_icon().unwrap().clone())
+                .menu(&menu)
+                .show_menu_on_left_click(false)
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "tray_show" => {
+                        if let Some(window) = app.get_webview_window("main") {
+                            if window.is_visible().unwrap_or(true) {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                    }
+                    "tray_quit" => {
+                        let state = app.state::<commands::cfm::AppState>();
+                        state.service.shutdown();
+                        app.exit(0);
+                    }
+                    _ => {}
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            if window.is_visible().unwrap_or(true) {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                    }
+                })
+                .build(app)?;
 
-            // Register cleanup handler for when the app is closing
-            let window = app
-                .get_webview_window("main")
-                .expect("Failed to get main window");
-            window.on_window_event(
-                move |event| {
-                    if let tauri::WindowEvent::CloseRequested { .. } = event {}
-                },
-            );
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            greet,
-            get_opened_file_path,
-            toggle_devtools,
-            open_devtools,
-            close_devtools,
-            commands::files::list_dir,
-            commands::files::read_file_content,
-            commands::files::write_file_content,
-            commands::files::create_directory,
-            commands::files::create_file,
-            commands::files::delete_node,
-            commands::files::rename_node,
-            commands::git::get_current_branch,
-            commands::git::get_all_branches,
-            commands::git::switch_branch,
-            commands::git::get_git_status,
-            commands::git::git_pull,
+            commands::cfm::cfm_start_entry_with_input,
+            commands::cfm::cfm_stop_entry,
+            commands::cfm::cfm_restart_entry_with_input,
+            commands::cfm::cfm_runtime_snapshot,
+            commands::cfm::cfm_entry_logs,
+            commands::cfm::cfm_detect_cloudflared_path,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

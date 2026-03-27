@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above)
-            args: '--target aarch64-apple-darwin'
+          # - platform: 'macos-latest' # for Arm based macs (M1 and above)
+          #   args: '--target aarch64-apple-darwin'
           # - platform: 'macos-latest' # for Intel based macs
           #   args: '--target x86_64-apple-darwin'
           - platform: 'windows-latest'
@@ -26,17 +26,17 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Fetch all history for changelog generation
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
         with:
           version: latest
           run_install: false
@@ -47,7 +47,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
 
       - name: Setup pnpm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -102,7 +102,7 @@ jobs:
 
 
       # Build and upload release
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v1
         name: Build and upload release
         id: tauri_build
         timeout-minutes: 30
