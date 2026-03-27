@@ -1,16 +1,12 @@
 ## What's Changed
 
-🐛 Bug Fixes
-
-- Downgrade tauri-action version in build workflow ([c70efd8](../../commit/c70efd8))
-
 ♻️ Refactoring
 
-- Remove subtitle from RuntimeLogs component for cleaner interface ([d5c9ea2](../../commit/d5c9ea2))
+- Remove RuntimeLogs component and inline log display in Home page ([1e920c5](../../commit/1e920c5))
 
 🔨 Other Changes
 
-- Update version numbers in configuration files ([5091515](../../commit/5091515))
+- Bump version to 0.2.4 in package.json and tauri.conf.json ([592e131](../../commit/592e131))
 
 
-📋 Full Changelog: [5091515...d5c9ea2](../../compare/5091515...d5c9ea2)
+📋 Full Changelog: [592e131...1e920c5](../../compare/592e131...1e920c5)
