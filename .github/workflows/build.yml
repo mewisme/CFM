@@ -102,7 +102,7 @@ jobs:
 
 
       # Build and upload release
-      - uses: tauri-apps/tauri-action@v1
+      - uses: tauri-apps/tauri-action@v0
         name: Build and upload release
         id: tauri_build
         timeout-minutes: 30
