@@ -1,17 +1,16 @@
 ## What's Changed
 
-✨ Features
+🐛 Bug Fixes
 
-- Create a script to run uml web server via .bat script ([451aec9](../../commit/451aec9))
+- Downgrade tauri-action version in build workflow ([c70efd8](../../commit/c70efd8))
 
 ♻️ Refactoring
 
-- Add a toggle button to show/hide the uml editor in file viewer (#30) ([783eaba](../../commit/783eaba))
+- Remove subtitle from RuntimeLogs component for cleaner interface ([d5c9ea2](../../commit/d5c9ea2))
 
 🔨 Other Changes
 
-- Fold/unfold alt message ([30feb8e](../../commit/30feb8e))
-- Move related files to /features/UmlEditor folder + create useAltBlockCollapse to toggle alt section ([63feb7f](../../commit/63feb7f))
+- Update version numbers in configuration files ([5091515](../../commit/5091515))
 
 
-📋 Full Changelog: [783eaba...30feb8e](../../compare/783eaba...30feb8e)
+📋 Full Changelog: [5091515...d5c9ea2](../../compare/5091515...d5c9ea2)
