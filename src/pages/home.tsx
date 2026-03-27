@@ -11,7 +11,6 @@ import {
 } from "@/lib/tauri-cfm";
 import { EntriesList } from "@/features/cfm/entries-list";
 import { EntryForm } from "@/features/cfm/entry-form";
-import { RuntimeLogs } from "@/features/cfm/runtime-logs";
 import { SettingsForm } from "@/features/cfm/settings-form";
 
 const defaultForm: AccessEntryInput = {
@@ -290,7 +289,9 @@ export default function Home() {
               <CardDescription>{selectedEntry?.name ?? "Select an entry"}</CardDescription>
             </CardHeader>
             <CardContent>
-              <RuntimeLogs logs={logs} />
+              <pre className="h-[260px] w-full overflow-auto rounded-md bg-muted p-3 text-xs lg:h-[320px]">
+                {logs.length > 0 ? logs.join("\n") : "No logs yet"}
+              </pre>
             </CardContent>
           </Card>
 
