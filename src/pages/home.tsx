@@ -290,7 +290,7 @@ export default function Home() {
               <CardDescription>{selectedEntry?.name ?? "Select an entry"}</CardDescription>
             </CardHeader>
             <CardContent>
-              <RuntimeLogs subtitle={selectedEntry?.name ?? ""} logs={logs} />
+              <RuntimeLogs logs={logs} />
             </CardContent>
           </Card>
 
