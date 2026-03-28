@@ -4,7 +4,7 @@ CFM is a desktop manager for Cloudflare Tunnel (`cloudflared`) entries.
 
 ## What it does
 
-- Create and edit access entries (`http`, `tcp`, `ssh`, `rdp`)
+- Create and edit access entries (`tcp`, `ssh`, `rdp`)
 - Start, stop, and restart tunnels
 - Show runtime status and logs
 - Save app settings (including custom `cloudflared` path)

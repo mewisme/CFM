@@ -4,7 +4,7 @@ import { getDb } from "./db";
 
 export const ACCESS_ENTRIES_TABLE = "access_entries" as const;
 
-export type AccessType = "http" | "tcp" | "ssh" | "rdp";
+export type AccessType = "tcp" | "ssh" | "rdp";
 export type RestartPolicy = "never" | "on_failure" | "always";
 
 export interface AccessEntry {

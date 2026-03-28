@@ -315,7 +315,6 @@ fn build_args(entry: &AccessEntry) -> Vec<String> {
     let mut args = vec![
         "access".to_string(),
         match entry.access_type {
-            AccessType::Http => "http",
             AccessType::Tcp => "tcp",
             AccessType::Ssh => "ssh",
             AccessType::Rdp => "rdp",
@@ -325,10 +324,6 @@ fn build_args(entry: &AccessEntry) -> Vec<String> {
         entry.hostname.clone(),
         "--url".to_string(),
     ];
-    let scheme = match entry.access_type {
-        AccessType::Http => "http://",
-        AccessType::Tcp | AccessType::Ssh | AccessType::Rdp => "tcp://",
-    };
-    args.push(format!("{scheme}{}", entry.target));
+    args.push(format!("tcp://{}", entry.target));
     args
 }

@@ -55,7 +55,7 @@ const msgDialogFilterAllFiles = msg`All files`;
 
 const defaultForm: AccessEntryInput = {
   name: "",
-  access_type: "http",
+  access_type: "tcp",
   hostname: "",
   target: "",
   autostart: false,

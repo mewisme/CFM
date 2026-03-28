@@ -18,7 +18,7 @@ export interface CfmEntriesExportDocument {
   entries: AccessEntryInput[];
 }
 
-const ACCESS_TYPES = new Set<AccessEntryInput["access_type"]>(["http", "tcp", "ssh", "rdp"]);
+const ACCESS_TYPES = new Set<AccessEntryInput["access_type"]>(["tcp", "ssh", "rdp"]);
 const RESTART_POLICIES = new Set<AccessEntryInput["restart_policy"]>([
   "never",
   "on_failure",

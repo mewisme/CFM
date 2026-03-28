@@ -84,7 +84,6 @@ export function EntryForm(props: {
             <SelectValue placeholder={i18n._(msg`Access type`)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="http">HTTP</SelectItem>
             <SelectItem value="tcp">TCP</SelectItem>
             <SelectItem value="ssh">SSH</SelectItem>
             <SelectItem value="rdp">RDP</SelectItem>
