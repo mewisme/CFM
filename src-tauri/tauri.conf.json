@@ -48,7 +48,7 @@
     "shortDescription": "Cloudflared Access Manager is a desktop application for managing Cloudflare Tunnel entries.",
     "category": "Utility",
     "license": "MIT",
-    "copyright": "Copyright 2026 Mew <hi@mewis.me>",
+    "copyright": "Copyright 2026 Mew. All rights reserved.",
     "targets": [
       "nsis",
       "msi"
