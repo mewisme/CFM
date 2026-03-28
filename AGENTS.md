@@ -100,7 +100,7 @@ Registered in `src-tauri/src/lib.rs` via `generate_handler!`.
 | `cfm_runtime_snapshot` | `cfm` | Current runtime rows (status, pid, errors) |
 | `cfm_entry_logs` | `cfm` | Log lines for an entry id |
 | `cfm_detect_cloudflared_path` | `cfm` | Resolve `cloudflared` via `where` (Windows) or `which` (Unix) |
-| `splash_close` | `splash` | Close splash; optional `showMain` (default true) — if false, main stays hidden (login autostart + start in tray) |
+| `splash_close` | `splash` | Close splash; optional `showMain` (`false` = do not show/focus main; omit = show main) |
 
 ## Build / dev / app commands
 
