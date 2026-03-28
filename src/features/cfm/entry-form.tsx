@@ -48,7 +48,6 @@ function EntrySwitchRow(props: {
 }
 
 export function EntryForm(props: {
-  title: string;
   value: AccessEntryInput;
   isEditMode: boolean;
   canEdit: boolean;
@@ -58,12 +57,10 @@ export function EntryForm(props: {
   onReset: () => void;
   submitLabel: string;
 }) {
-  const { title, value, isEditMode, canEdit, onChange, onEdit, onSubmit, onReset, submitLabel } =
-    props;
+  const { value, isEditMode, canEdit, onChange, onEdit, onSubmit, onReset, submitLabel } = props;
 
   return (
     <div className="space-y-3">
-      <div className="text-sm font-medium">{title}</div>
       <Input
         placeholder="Name"
         value={value.name}

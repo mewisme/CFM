@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
+import { Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { INSTALL_CLOUDFLARED_MESSAGE, useAppSettings } from "@/components/settings-provider";
 import {
   cfmApi,
@@ -11,6 +20,7 @@ import {
 } from "@/lib/tauri-cfm";
 import { EntriesList } from "@/features/cfm/entries-list";
 import { EntryForm } from "@/features/cfm/entry-form";
+import { cn } from "@/lib/utils";
 
 const defaultForm: AccessEntryInput = {
   name: "",
@@ -75,6 +85,7 @@ export default function Home() {
   const [form, setForm] = useState<AccessEntryInput>(defaultForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(true);
+  const [formOpen, setFormOpen] = useState(false);
 
   function applyRuntimeResult(result: RuntimeEntry): void {
     setRuntime((prev) => ({ ...prev, [result.id]: result }));
@@ -113,6 +124,18 @@ export default function Home() {
     setIsEditMode(true);
   }
 
+  function closeFormPanel() {
+    resetForm();
+    setSelectedId("");
+    setFormOpen(false);
+  }
+
+  function openNewEntry() {
+    resetForm();
+    setSelectedId("");
+    setFormOpen(true);
+  }
+
   function fillFormFromEntry(entry: AccessEntry) {
     setEditingId(entry.id);
     setIsEditMode(false);
@@ -149,7 +172,7 @@ export default function Home() {
       }
       setForm((prev) => ({ ...prev, target: normalizedForm.target }));
       await refreshEntries();
-      resetForm();
+      closeFormPanel();
     } catch (error) {
       toast.error(String(error));
     }
@@ -182,13 +205,26 @@ export default function Home() {
 
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-[1920px] flex-1 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 md:grid-rows-1 md:gap-4 lg:gap-5">
+      <div
+        className={cn(
+          "grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-rows-1 md:gap-4 lg:gap-5",
+          formOpen && "md:grid-cols-2",
+        )}
+      >
         <Card className="flex min-h-0 min-w-0 flex-col md:h-full">
           <CardHeader className="shrink-0 space-y-1 pb-3">
-            <CardTitle className="text-base sm:text-lg">Entries</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Manage Cloudflare Access routes
-            </CardDescription>
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div className="min-w-0 space-y-1">
+                <CardTitle className="text-base sm:text-lg">Entries</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Manage Cloudflare Access routes
+                </CardDescription>
+              </div>
+              <Button type="button" size="sm" className="shrink-0 gap-1.5" onClick={openNewEntry}>
+                <Plus className="size-4" />
+                New entry
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 pb-4">
             <EntriesList
@@ -197,6 +233,7 @@ export default function Home() {
               selectedId={selectedId}
               onSelect={(id) => {
                 setSelectedId(id);
+                setFormOpen(true);
                 const entry = entries.find((item) => item.id === id);
                 if (entry) {
                   fillFormFromEntry(entry);
@@ -215,32 +252,55 @@ export default function Home() {
                   await cfmApi.deleteEntry(id);
                   await refreshEntries();
                   await refreshRuntime();
+                  setSelectedId((current) => {
+                    if (current !== id) {
+                      return current;
+                    }
+                    Promise.resolve().then(() => {
+                      resetForm();
+                      setFormOpen(false);
+                    });
+                    return "";
+                  });
                 })();
               }}
             />
           </CardContent>
         </Card>
 
-        <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:h-full">
-          <CardHeader className="shrink-0 space-y-1">
-            <CardTitle className="text-base sm:text-lg">
-              {editingId ? "Edit entry" : "New entry"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6">
-            <EntryForm
-              title={editingId ? "View / edit" : "Create"}
-              value={form}
-              isEditMode={Boolean(editingId)}
-              canEdit={!editingId || isEditMode}
-              onChange={setForm}
-              submitLabel={editingId ? "Save" : "Create"}
-              onEdit={() => setIsEditMode(true)}
-              onSubmit={() => void submitEntry()}
-              onReset={resetForm}
-            />
-          </CardContent>
-        </Card>
+        {formOpen ? (
+          <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:h-full">
+            <CardHeader className="shrink-0 pb-3">
+              <CardTitle className="text-base sm:text-lg">
+                {editingId ? "Edit entry" : "New entry"}
+              </CardTitle>
+              <CardAction>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  title="Close"
+                  aria-label="Close form"
+                  onClick={closeFormPanel}
+                >
+                  <X className="size-4" />
+                </Button>
+              </CardAction>
+            </CardHeader>
+            <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6">
+              <EntryForm
+                value={form}
+                isEditMode={Boolean(editingId)}
+                canEdit={!editingId || isEditMode}
+                onChange={setForm}
+                submitLabel={editingId ? "Save" : "Create"}
+                onEdit={() => setIsEditMode(true)}
+                onSubmit={() => void submitEntry()}
+                onReset={resetForm}
+              />
+            </CardContent>
+          </Card>
+        ) : null}
       </div>
     </div>
   );
