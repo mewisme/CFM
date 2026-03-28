@@ -2,7 +2,11 @@ import { readTextFile as fsReadTextFile, writeTextFile as fsWriteTextFile } from
 
 import type { AccessEntry, AccessEntryInput } from "@/lib/tauri-cfm";
 
-import { normalizeTarget, validateEntryForm } from "./entry-validation";
+import {
+  ENTRY_VALIDATION_EN,
+  normalizeTarget,
+  validateEntryForm,
+} from "./entry-validation";
 
 export const CFM_ENTRIES_FILE_FORMAT = "cfm-entries" as const;
 export const CFM_ENTRIES_FILE_VERSION = 1 as const;
@@ -70,7 +74,7 @@ function parseEntryInput(raw: unknown, index: number): AccessEntryInput {
   };
   const errors = validateEntryForm(normalized);
   if (errors.length > 0) {
-    throw new Error(`Entry ${index + 1}: ${errors[0]}`);
+    throw new Error(`Entry ${index + 1}: ${ENTRY_VALIDATION_EN[errors[0]]}`);
   }
   return normalized;
 }

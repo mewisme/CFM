@@ -1,8 +1,11 @@
-import { getCurrentWindow } from '@tauri-apps/api/window';
-import { Minus, Square, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { Minus, Square, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function MacOSButtons() {
+  const { i18n } = useLingui();
   const appWindow = getCurrentWindow();
   const [isFocused, setIsFocused] = useState(true);
 
@@ -32,8 +35,8 @@ export function MacOSButtons() {
     <div className="flex items-center gap-2 group">
       <button
         onClick={handleClose}
-        title="Hide to tray"
-        aria-label="Hide window to system tray"
+        title={i18n._(msg`Hide to tray`)}
+        aria-label={i18n._(msg`Hide window to system tray`)}
         className={`cursor-pointer w-3 h-3 rounded-full border-[0.5px] border-black/4 flex items-center justify-center relative hover:brightness-95 transition-colors ${isFocused ? 'bg-[#ff5f57]' : 'bg-primary/30'
           }`}
       >
@@ -41,8 +44,8 @@ export function MacOSButtons() {
       </button>
       <button
         onClick={handleMinimize}
-        title="Minimize"
-        aria-label="Minimize window"
+        title={i18n._(msg`Minimize`)}
+        aria-label={i18n._(msg`Minimize window`)}
         className={`cursor-pointer w-3 h-3 rounded-full border-[0.5px] border-black/4 flex items-center justify-center relative hover:brightness-95 transition-colors ${isFocused ? 'bg-[#ffbd2e]' : 'bg-primary/30'
           }`}
       >
@@ -50,8 +53,8 @@ export function MacOSButtons() {
       </button>
       <button
         onClick={handleMaximize}
-        title="Maximize"
-        aria-label="Maximize window"
+        title={i18n._(msg`Maximize`)}
+        aria-label={i18n._(msg`Maximize window`)}
         className={`cursor-pointer w-3 h-3 rounded-full border-[0.5px] border-black/4 flex items-center justify-center relative hover:brightness-95 transition-colors ${isFocused ? 'bg-[#28c840]' : 'bg-primary/30'
           }`}
       >

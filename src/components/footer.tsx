@@ -35,7 +35,9 @@ export function Footer() {
         className="flex items-center gap-1.5 hover:text-foreground transition-colors"
       >
         <Github size={14} />
-        <span>GitHub</span>
+        <span>
+          <Trans>GitHub</Trans>
+        </span>
       </a>
 
       <span className="text-muted-foreground/50">•</span>

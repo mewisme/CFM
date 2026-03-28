@@ -1,16 +1,21 @@
-import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
+import type { I18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import { getVersion } from "@tauri-apps/api/app";
 import {
   isPermissionGranted,
   requestPermission,
   sendNotification,
 } from "@tauri-apps/plugin-notification";
-import { check, type DownloadEvent } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
-import { getVersion } from "@tauri-apps/api/app";
+import { check, type DownloadEvent } from "@tauri-apps/plugin-updater";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/app-icon.png";
 
@@ -28,7 +33,7 @@ export interface UpdateInfo {
   error?: string;
 }
 
-async function notifyNewVersionAvailable(newVersion: string): Promise<void> {
+async function notifyNewVersionAvailable(newVersion: string, i18n: I18n): Promise<void> {
   try {
     let permissionGranted = await isPermissionGranted();
     if (!permissionGranted) {
@@ -37,8 +42,10 @@ async function notifyNewVersionAvailable(newVersion: string): Promise<void> {
     }
     if (permissionGranted) {
       sendNotification({
-        title: "CFM update available",
-        body: `Version ${newVersion} is ready. Open the app and click the version in the footer to install.`,
+        title: i18n._(msg`CFM update available`),
+        body: i18n._(
+          msg`Version ${newVersion} is ready. Open the app and click the version in the footer to install.`,
+        ),
       });
     }
   } catch (error) {
@@ -47,6 +54,7 @@ async function notifyNewVersionAvailable(newVersion: string): Promise<void> {
 }
 
 export function VersionDisplay({ className }: { className?: string }) {
+  const { i18n } = useLingui();
   const [version, setVersion] = useState("");
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo>({
     status: UpdateStatus.CHECKING,
@@ -73,7 +81,7 @@ export function VersionDisplay({ className }: { className?: string }) {
           notifiedUpdateVersionRef.current !== update.version
         ) {
           notifiedUpdateVersionRef.current = update.version;
-          void notifyNewVersionAvailable(update.version);
+          void notifyNewVersionAvailable(update.version, i18n);
         }
       } else {
         setUpdateInfo({
@@ -86,26 +94,22 @@ export function VersionDisplay({ className }: { className?: string }) {
       setUpdateInfo({
         status: UpdateStatus.ERROR,
         currentVersion: version,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : i18n._(msg`Unknown error`),
       });
     }
   };
 
   useEffect(() => {
-
     getVersion().then((currentVersion) => {
       setVersion(currentVersion);
       setUpdateInfo((prev) => ({ ...prev, currentVersion }));
     });
 
-
     checkForUpdates();
-
 
     const interval = setInterval(checkForUpdates, 1000 * 60 * 60);
     return () => clearInterval(interval);
   }, []);
-
 
   useEffect(() => {
     if (showUpdateDialog) {
@@ -113,7 +117,6 @@ export function VersionDisplay({ className }: { className?: string }) {
     }
   }, [showUpdateDialog]);
 
-  // Listen for update check command
   useEffect(() => {
     const handleShowUpdateDialog = () => {
       setShowUpdateDialog(true);
@@ -129,7 +132,7 @@ export function VersionDisplay({ className }: { className?: string }) {
       const update = await check();
 
       if (!update) {
-        toast.error("No update available");
+        toast.error(i18n._(msg`No update available`));
         return;
       }
 
@@ -157,11 +160,13 @@ export function VersionDisplay({ className }: { className?: string }) {
         }
       });
 
-      toast.success("Update installed successfully!");
+      toast.success(i18n._(msg`Update installed successfully!`));
       await relaunch();
     } catch (error) {
       console.error("Failed to update:", error);
-      toast.error("Failed to update: " + error);
+      toast.error(
+        `${i18n._(msg`Failed to update`)}: ${error instanceof Error ? error.message : String(error)}`,
+      );
     } finally {
       setIsUpdating(false);
       setShowUpdateDialog(false);
@@ -174,23 +179,28 @@ export function VersionDisplay({ className }: { className?: string }) {
         return (
           <div className="flex items-center gap-2 justify-center">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-sky-500 border-t-transparent"></div>
-            <span>Checking for updates...</span>
+            <span>
+              <Trans>Checking for updates...</Trans>
+            </span>
           </div>
         );
       case UpdateStatus.AVAILABLE:
         return (
           <div className="text-center">
-            A new version (v{updateInfo.newVersion}) is available!
+            <Trans>A new version (v{updateInfo.newVersion}) is available!</Trans>
           </div>
         );
       case UpdateStatus.LATEST:
         return (
-          <div className="text-center">You're running the latest version</div>
+          <div className="text-center">
+            <Trans>You&apos;re running the latest version</Trans>
+          </div>
         );
       case UpdateStatus.ERROR:
         return (
           <div className="text-center text-red-500">
-            Failed to check for updates: {updateInfo.error || "Unknown error"}
+            {i18n._(msg`Failed to check for updates`)}:{" "}
+            {updateInfo.error || i18n._(msg`Unknown error`)}
           </div>
         );
     }
@@ -218,37 +228,32 @@ export function VersionDisplay({ className }: { className?: string }) {
       <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
         <DialogContent className="w-[280px] rounded-xl bg-background backdrop-blur-sm [&>button]:text-foreground [&>button]:cursor-pointer [&>button:hover]:text-foreground/80">
           <div className="flex flex-col items-center gap-4 py-4">
-            { }
             <div className="w-20 h-20 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
               <img src={logo} alt="CFM" className="w-full h-full object-contain" />
             </div>
 
-            { }
             <div className="space-y-3 w-full">
               <div className="text-center space-y-0.5">
                 <h2 className="text-xl font-semibold text-foreground">CFM</h2>
-                <p className="text-xs text-gray-400">Version {version}</p>
+                <p className="text-xs text-gray-400">
+                  <Trans>Version {version}</Trans>
+                </p>
                 <p className="text-[10px] text-gray-500 max-w-[240px] mx-auto mt-2">
-                  Cloudflared Access Manager
+                  <Trans>Cloudflared Access Manager</Trans>
                 </p>
               </div>
 
-              { }
-              <div className="text-xs text-foreground py-1.5">
-                {getStatusMessage()}
-              </div>
+              <div className="text-xs text-foreground py-1.5">{getStatusMessage()}</div>
 
-              { }
               {isUpdating && (
                 <div className="space-y-1.5 px-3">
                   <Progress value={updateProgress} className="h-1" />
                   <p className="text-xs text-gray-400 text-center">
-                    Downloading update: {Math.round(updateProgress)}%
+                    <Trans>Downloading update: {Math.round(updateProgress)}%</Trans>
                   </p>
                 </div>
               )}
 
-              { }
               {updateInfo.status === UpdateStatus.AVAILABLE && (
                 <div className="flex justify-center gap-2">
                   <Button
@@ -258,15 +263,18 @@ export function VersionDisplay({ className }: { className?: string }) {
                     disabled={isUpdating}
                     className="text-xs"
                   >
-                    {isUpdating ? "Updating..." : "Update Now"}
+                    {isUpdating ? (
+                      <Trans>Updating...</Trans>
+                    ) : (
+                      <Trans>Update Now</Trans>
+                    )}
                   </Button>
                 </div>
               )}
             </div>
 
-            { }
             <div className="text-[10px] text-gray-500 text-center">
-              © {new Date().getFullYear()} CFM. All rights reserved.
+              <Trans>© {new Date().getFullYear()} CFM. All rights reserved.</Trans>
             </div>
           </div>
         </DialogContent>

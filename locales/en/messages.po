@@ -14,36 +14,59 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. placeholder {0}: plan.skippedInFile
-#: src/pages/home.tsx:202
+#: src/pages/home.tsx:209
 msgid "{0, plural, one {# duplicate row skipped in file} other {# duplicate rows skipped in file}}"
 msgstr "{0, plural, one {# duplicate row skipped in file} other {# duplicate rows skipped in file}}"
 
 #. placeholder {0}: plan.toCreate.length
-#: src/pages/home.tsx:182
+#: src/pages/home.tsx:189
 msgid "{0, plural, one {Created # entry} other {Created # entries}}"
 msgstr "{0, plural, one {Created # entry} other {Created # entries}}"
 
 #. placeholder {0}: entries.length
-#: src/pages/home.tsx:159
+#: src/pages/home.tsx:166
 msgid "{0, plural, one {Exported # entry} other {Exported # entries}}"
 msgstr "{0, plural, one {Exported # entry} other {Exported # entries}}"
 
 #. placeholder {0}: plan.toOverwrite.length
-#: src/pages/home.tsx:192
+#: src/pages/home.tsx:199
 msgid "{0, plural, one {Updated # entry} other {Updated # entries}}"
 msgstr "{0, plural, one {Updated # entry} other {Updated # entries}}"
 
 #. placeholder {0}: pendingImportPlan.toCreate.length
-#: src/pages/home.tsx:478
+#: src/pages/home.tsx:488
 msgid "{0} new routes will be added."
 msgstr "{0} new routes will be added."
 
 #. placeholder {0}: pendingImportPlan.toOverwrite.length
-#: src/pages/home.tsx:468
+#: src/pages/home.tsx:478
 msgid "{0} routes in the file use the same hostname and target as entries already in your list."
 msgstr "{0} routes in the file use the same hostname and target as entries already in your list."
 
-#: src/features/cfm/settings-form.tsx:148
+#. placeholder {0}: new Date().getFullYear()
+#: src/features/updater/version-display.tsx:277
+msgid "© {0} CFM. All rights reserved."
+msgstr "© {0} CFM. All rights reserved."
+
+#. placeholder {0}: updateInfo.newVersion
+#: src/features/updater/version-display.tsx:190
+msgid "A new version (v{0}) is available!"
+msgstr "A new version (v{0}) is available!"
+
+#: src/features/cfm/entry-form.tsx:84
+msgid "Access type"
+msgstr "Access type"
+
+#: src/features/cfm/settings-form.tsx:45
+#: src/pages/home.tsx:54
+msgid "All files"
+msgstr "All files"
+
+#: src/features/cfm/entry-form.tsx:110
+msgid "Always"
+msgstr "Always"
+
+#: src/features/cfm/settings-form.tsx:150
 msgid "Appearance"
 msgstr "Appearance"
 
@@ -51,20 +74,33 @@ msgstr "Appearance"
 msgid "Application and cloudflared preferences"
 msgstr "Application and cloudflared preferences"
 
-#: src/features/cfm/settings-form.tsx:234
-#: src/pages/home.tsx:491
+#: src/features/cfm/entry-form.tsx:144
+msgid "Autostart"
+msgstr "Autostart"
+
+#: src/features/cfm/entries-list.tsx:152
+#: src/features/cfm/settings-form.tsx:236
+#: src/pages/home.tsx:501
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/features/cfm/settings-form.tsx:222
+#: src/features/updater/version-display.tsx:45
+msgid "CFM update available"
+msgstr "CFM update available"
+
+#: src/features/updater/version-display.tsx:183
+msgid "Checking for updates..."
+msgstr "Checking for updates..."
+
+#: src/features/cfm/settings-form.tsx:224
 msgid "Clear all local data?"
 msgstr "Clear all local data?"
 
-#: src/features/cfm/settings-form.tsx:240
+#: src/features/cfm/settings-form.tsx:242
 msgid "Clear data"
 msgstr "Clear data"
 
-#: src/features/cfm/settings-form.tsx:216
+#: src/features/cfm/settings-form.tsx:218
 msgid "Clear local data"
 msgstr "Clear local data"
 
@@ -72,15 +108,21 @@ msgstr "Clear local data"
 msgid "Click to select cloudflared executable…"
 msgstr "Click to select cloudflared executable…"
 
-#: src/pages/home.tsx:421
+#: src/pages/home.tsx:431
 msgid "Close"
 msgstr "Close"
 
-#: src/pages/home.tsx:422
+#: src/pages/home.tsx:432
 msgid "Close form"
 msgstr "Close form"
 
-#: src/features/cfm/settings-form.tsx:93
+#: src/features/titlebar/mac-os-titlebar.tsx:17
+#: src/features/titlebar/windows-titlebar.tsx:14
+#: src/features/updater/version-display.tsx:242
+msgid "Cloudflared Access Manager"
+msgstr "Cloudflared Access Manager"
+
+#: src/features/cfm/settings-form.tsx:95
 msgid "Cloudflared executable"
 msgstr "Cloudflared executable"
 
@@ -88,59 +130,128 @@ msgstr "Cloudflared executable"
 msgid "cloudflared is not detected. Install Cloudflare Tunnel and reopen the app, or set the binary path in Settings."
 msgstr "cloudflared is not detected. Install Cloudflare Tunnel and reopen the app, or set the binary path in Settings."
 
-#: src/pages/home.tsx:435
+#: src/pages/home.tsx:445
 msgid "Create"
 msgstr "Create"
 
-#: src/features/cfm/settings-form.tsx:160
+#: src/features/cfm/settings-form.tsx:162
 msgid "Dark"
 msgstr "Dark"
 
-#: src/pages/home.tsx:414
+#: src/features/cfm/entries-list.tsx:132
+#: src/features/cfm/entries-list.tsx:133
+#: src/features/cfm/entries-list.tsx:161
+msgid "Delete"
+msgstr "Delete"
+
+#: src/features/cfm/entries-list.tsx:142
+msgid "Delete entry?"
+msgstr "Delete entry?"
+
+#. placeholder {0}: Math.round(updateProgress)
+#: src/features/updater/version-display.tsx:252
+msgid "Downloading update: {0}%"
+msgstr "Downloading update: {0}%"
+
+#: src/features/cfm/entry-form.tsx:172
+msgid "Edit"
+msgstr "Edit"
+
+#: src/pages/home.tsx:424
 msgid "Edit entry"
 msgstr "Edit entry"
 
-#: src/pages/home.tsx:334
+#: src/features/cfm/entry-form.tsx:135
+msgid "Enabled"
+msgstr "Enabled"
+
+#: src/pages/home.tsx:344
 msgid "Entries"
 msgstr "Entries"
 
-#: src/pages/home.tsx:286
+#: src/pages/home.tsx:296
 msgid "Entry created"
 msgstr "Entry created"
 
-#: src/pages/home.tsx:283
+#: src/pages/home.tsx:293
 msgid "Entry updated"
 msgstr "Entry updated"
 
-#: src/pages/home.tsx:359
+#: src/features/cfm/settings-form.tsx:44
+msgid "Executable"
+msgstr "Executable"
+
+#: src/pages/home.tsx:369
 msgid "Export"
 msgstr "Export"
 
-#: src/pages/home.tsx:149
+#: src/pages/home.tsx:156
 msgid "Export entries"
 msgstr "Export entries"
 
-#: src/pages/home.tsx:349
+#: src/features/cfm/entries-list.tsx:27
+msgid "Failed"
+msgstr "Failed"
+
+#: src/features/updater/version-display.tsx:202
+msgid "Failed to check for updates"
+msgstr "Failed to check for updates"
+
+#: src/features/updater/version-display.tsx:168
+msgid "Failed to update"
+msgstr "Failed to update"
+
+#: src/components/footer.tsx:39
+msgid "GitHub"
+msgstr "GitHub"
+
+#: src/features/titlebar/mac-os-buttons.tsx:38
+#: src/features/titlebar/windows-buttons.tsx:54
+msgid "Hide to tray"
+msgstr "Hide to tray"
+
+#: src/features/titlebar/mac-os-buttons.tsx:39
+#: src/features/titlebar/windows-buttons.tsx:55
+msgid "Hide window to system tray"
+msgstr "Hide window to system tray"
+
+#: src/features/cfm/entry-form.tsx:116
+msgid "Hostname (example.com)"
+msgstr "Hostname (example.com)"
+
+#: src/lib/entry-validation.ts:18
+msgid "Hostname contains invalid characters."
+msgstr "Hostname contains invalid characters."
+
+#: src/lib/entry-validation.ts:17
+msgid "Hostname is required."
+msgstr "Hostname is required."
+
+#: src/pages/home.tsx:359
 msgid "Import"
 msgstr "Import"
 
-#: src/pages/home.tsx:231
+#: src/pages/home.tsx:238
 msgid "Import entries"
 msgstr "Import entries"
 
-#: src/features/cfm/settings-form.tsx:177
+#: src/pages/home.tsx:53
+msgid "JSON"
+msgstr "JSON"
+
+#: src/features/cfm/settings-form.tsx:179
 msgid "Language"
 msgstr "Language"
 
-#: src/features/cfm/settings-form.tsx:128
+#: src/features/cfm/settings-form.tsx:130
 msgid "Launch at login"
 msgstr "Launch at login"
 
-#: src/features/cfm/settings-form.tsx:157
+#: src/features/cfm/settings-form.tsx:159
 msgid "Light"
 msgstr "Light"
 
-#: src/features/cfm/settings-form.tsx:204
+#: src/features/cfm/settings-form.tsx:206
 msgid "Local data"
 msgstr "Local data"
 
@@ -148,61 +259,127 @@ msgstr "Local data"
 msgid "Local data cleared"
 msgstr "Local data cleared"
 
-#: src/pages/home.tsx:337
+#: src/pages/home.tsx:347
 msgid "Manage Cloudflare Access routes"
 msgstr "Manage Cloudflare Access routes"
 
-#: src/pages/home.tsx:363
-#: src/pages/home.tsx:414
+#: src/features/titlebar/mac-os-buttons.tsx:56
+#: src/features/titlebar/windows-buttons.tsx:46
+msgid "Maximize"
+msgstr "Maximize"
+
+#: src/features/titlebar/mac-os-buttons.tsx:57
+#: src/features/titlebar/windows-buttons.tsx:47
+msgid "Maximize window"
+msgstr "Maximize window"
+
+#: src/features/titlebar/mac-os-buttons.tsx:47
+#: src/features/titlebar/windows-buttons.tsx:38
+msgid "Minimize"
+msgstr "Minimize"
+
+#: src/features/titlebar/mac-os-buttons.tsx:48
+#: src/features/titlebar/windows-buttons.tsx:39
+msgid "Minimize window"
+msgstr "Minimize window"
+
+#: src/features/cfm/entry-form.tsx:72
+msgid "Name"
+msgstr "Name"
+
+#: src/lib/entry-validation.ts:16
+msgid "Name is required."
+msgstr "Name is required."
+
+#: src/features/cfm/entry-form.tsx:104
+msgid "Never"
+msgstr "Never"
+
+#: src/pages/home.tsx:373
+#: src/pages/home.tsx:424
 msgid "New entry"
 msgstr "New entry"
 
-#: src/pages/home.tsx:242
+#: src/pages/home.tsx:252
 msgid "No entries in file"
 msgstr "No entries in file"
 
-#: src/pages/home.tsx:252
+#: src/features/updater/version-display.tsx:135
+msgid "No update available"
+msgstr "No update available"
+
+#: src/pages/home.tsx:262
 msgid "Nothing to import."
 msgstr "Nothing to import."
 
 #. placeholder {0}: plan.skippedInFile
-#: src/pages/home.tsx:249
+#: src/pages/home.tsx:259
 msgid "Nothing to import. {0} duplicate(s) in file."
 msgstr "Nothing to import. {0} duplicate(s) in file."
 
-#: src/pages/home.tsx:476
+#: src/features/cfm/entry-form.tsx:107
+msgid "On failure"
+msgstr "On failure"
+
+#: src/pages/home.tsx:486
 msgid "One new route will be added."
 msgstr "One new route will be added."
 
-#: src/pages/home.tsx:463
+#: src/pages/home.tsx:473
 msgid "One route in the file uses the same hostname and target as an entry already in your list."
 msgstr "One route in the file uses the same hostname and target as an entry already in your list."
 
-#: src/features/cfm/settings-form.tsx:112
+#: src/features/cfm/entry-form.tsx:153
+msgid "Opens a separate terminal window for this process (Windows). Changing this requires stopping and starting the tunnel again."
+msgstr "Opens a separate terminal window for this process (Windows). Changing this requires stopping and starting the tunnel again."
+
+#: src/features/cfm/settings-form.tsx:114
 msgid "Opens the system file dialog. Windows: .exe; other OS: use \"All files\" if needed."
 msgstr "Opens the system file dialog. Windows: .exe; other OS: use \"All files\" if needed."
 
-#: src/pages/home.tsx:500
+#: src/pages/home.tsx:510
 msgid "Overwrite"
 msgstr "Overwrite"
 
-#: src/pages/home.tsx:457
+#: src/pages/home.tsx:467
 msgid "Overwrite existing entries?"
 msgstr "Overwrite existing entries?"
 
-#: src/pages/home.tsx:484
+#: src/pages/home.tsx:494
 msgid "Overwrite matching entries with the values from the file?"
 msgstr "Overwrite matching entries with the values from the file?"
 
-#: src/features/cfm/settings-form.tsx:207
+#: src/lib/entry-validation.ts:21
+msgid "Port must be between 1 and 65535."
+msgstr "Port must be between 1 and 65535."
+
+#: src/features/cfm/settings-form.tsx:209
 msgid "Remove all saved entries and settings from this device and recreate an empty database. Restart the app if tunnels were running."
 msgstr "Remove all saved entries and settings from this device and recreate an empty database. Restart the app if tunnels were running."
 
-#: src/pages/home.tsx:435
+#: src/features/cfm/entry-form.tsx:181
+msgid "Reset"
+msgstr "Reset"
+
+#: src/features/cfm/entries-list.tsx:116
+#: src/features/cfm/entries-list.tsx:117
+#: src/features/cfm/entry-form.tsx:100
+msgid "Restart"
+msgstr "Restart"
+
+#: src/features/cfm/entry-form.tsx:130
+msgid "Route options"
+msgstr "Route options"
+
+#: src/features/cfm/entries-list.tsx:25
+msgid "Running"
+msgstr "Running"
+
+#: src/pages/home.tsx:445
 msgid "Save"
 msgstr "Save"
 
-#: src/features/cfm/settings-form.tsx:198
+#: src/features/cfm/settings-form.tsx:200
 msgid "Save settings"
 msgstr "Save settings"
 
@@ -219,18 +396,102 @@ msgstr "Settings"
 msgid "Settings saved"
 msgstr "Settings saved"
 
-#: src/features/cfm/settings-form.tsx:141
+#: src/features/cfm/entry-form.tsx:151
+msgid "Show cloudflared console"
+msgstr "Show cloudflared console"
+
+#: src/features/cfm/entries-list.tsx:90
+#: src/features/cfm/entries-list.tsx:91
+msgid "Start"
+msgstr "Start"
+
+#: src/features/cfm/settings-form.tsx:143
 msgid "Start in tray when launched at login"
 msgstr "Start in tray when launched at login"
 
-#: src/features/cfm/settings-form.tsx:163
+#: src/features/cfm/entry-form.tsx:145
+msgid "Start this tunnel automatically when CFM launches."
+msgstr "Start this tunnel automatically when CFM launches."
+
+#: src/features/cfm/entries-list.tsx:24
+msgid "Starting"
+msgstr "Starting"
+
+#: src/features/cfm/entries-list.tsx:104
+#: src/features/cfm/entries-list.tsx:105
+msgid "Stop"
+msgstr "Stop"
+
+#: src/features/cfm/entry-form.tsx:54
+msgid "Stop the tunnel, then Start again for the console window setting to take effect."
+msgstr "Stop the tunnel, then Start again for the console window setting to take effect."
+
+#: src/features/cfm/entries-list.tsx:23
+msgid "Stopped"
+msgstr "Stopped"
+
+#: src/features/cfm/entries-list.tsx:26
+msgid "Stopping"
+msgstr "Stopping"
+
+#: src/features/cfm/settings-form.tsx:165
 msgid "System"
 msgstr "System"
+
+#: src/features/cfm/entry-form.tsx:122
+msgid "Target (127.0.0.1:3000)"
+msgstr "Target (127.0.0.1:3000)"
+
+#: src/lib/entry-validation.ts:19
+msgid "Target is required."
+msgstr "Target is required."
+
+#: src/lib/entry-validation.ts:20
+msgid "Target must be a port or host:port (example: 3000 or 127.0.0.1:3000)."
+msgstr "Target must be a port or host:port (example: 3000 or 127.0.0.1:3000)."
 
 #: src/features/cfm/settings-form.tsx:43
 msgid "Theme"
 msgstr "Theme"
 
-#: src/features/cfm/settings-form.tsx:225
+#: src/features/cfm/settings-form.tsx:227
 msgid "This deletes the tunnel entries and app settings stored in CFM's database on this device. This cannot be undone. If any tunnels are running, close them or restart the app afterward."
 msgstr "This deletes the tunnel entries and app settings stored in CFM's database on this device. This cannot be undone. If any tunnels are running, close them or restart the app afterward."
+
+#. placeholder {0}: entry.name
+#: src/features/cfm/entries-list.tsx:145
+msgid "This will permanently remove <0>{0}</0>."
+msgstr "This will permanently remove <0>{0}</0>."
+
+#: src/features/updater/version-display.tsx:97
+#: src/features/updater/version-display.tsx:203
+msgid "Unknown error"
+msgstr "Unknown error"
+
+#: src/features/updater/version-display.tsx:163
+msgid "Update installed successfully!"
+msgstr "Update installed successfully!"
+
+#: src/features/updater/version-display.tsx:269
+msgid "Update Now"
+msgstr "Update Now"
+
+#: src/features/updater/version-display.tsx:267
+msgid "Updating..."
+msgstr "Updating..."
+
+#: src/features/updater/version-display.tsx:47
+msgid "Version {newVersion} is ready. Open the app and click the version in the footer to install."
+msgstr "Version {newVersion} is ready. Open the app and click the version in the footer to install."
+
+#: src/features/updater/version-display.tsx:239
+msgid "Version {version}"
+msgstr "Version {version}"
+
+#: src/features/cfm/entry-form.tsx:137
+msgid "When off, this route is skipped and won’t start with the app."
+msgstr "When off, this route is skipped and won’t start with the app."
+
+#: src/features/updater/version-display.tsx:196
+msgid "You're running the latest version"
+msgstr "You're running the latest version"

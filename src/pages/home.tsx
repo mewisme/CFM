@@ -43,8 +43,15 @@ import {
   writeTextFile,
   type ImportPlan,
 } from "@/lib/entries-import-export";
-import { normalizeTarget, validateEntryForm } from "@/lib/entry-validation";
+import {
+  entryValidationMessages,
+  normalizeTarget,
+  validateEntryForm,
+} from "@/lib/entry-validation";
 import { cn } from "@/lib/utils";
+
+const msgDialogFilterJson = msg`JSON`;
+const msgDialogFilterAllFiles = msg`All files`;
 
 const defaultForm: AccessEntryInput = {
   name: "",
@@ -148,7 +155,7 @@ export default function Home() {
     const path = await save({
       title: i18n._(msg`Export entries`),
       defaultPath: "cfm-entries.json",
-      filters: [{ name: "JSON", extensions: ["json"] }],
+      filters: [{ name: i18n._(msgDialogFilterJson), extensions: ["json"] }],
     });
     if (path === null) {
       return;
@@ -231,7 +238,10 @@ export default function Home() {
       title: i18n._(msg`Import entries`),
       multiple: false,
       directory: false,
-      filters: [{ name: "JSON", extensions: ["json"] }, { name: "All files", extensions: ["*"] }],
+      filters: [
+        { name: i18n._(msgDialogFilterJson), extensions: ["json"] },
+        { name: i18n._(msgDialogFilterAllFiles), extensions: ["*"] },
+      ],
     });
     if (path === null) {
       return;
@@ -274,7 +284,7 @@ export default function Home() {
       };
       const errors = validateEntryForm(normalizedForm);
       if (errors.length > 0) {
-        toast.error(errors[0]);
+        toast.error(i18n._(entryValidationMessages[errors[0]]));
         return;
       }
 

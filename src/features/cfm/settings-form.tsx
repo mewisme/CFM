@@ -41,6 +41,8 @@ const msgClickToSelectCloudflared = defineMessage({
   message: "Click to select cloudflared executable…",
 });
 const msgThemePlaceholder = defineMessage({ message: "Theme" });
+const msgFilterExecutable = defineMessage({ message: "Executable" });
+const msgFilterAllFiles = defineMessage({ message: "All files" });
 
 async function pickCloudflaredExecutable(
   currentPath: string | null | undefined
@@ -51,8 +53,8 @@ async function pickCloudflaredExecutable(
     directory: false,
     defaultPath: currentPath?.trim() || undefined,
     filters: [
-      { name: "Executable", extensions: ["exe"] },
-      { name: "All files", extensions: ["*"] },
+      { name: i18n._(msgFilterExecutable), extensions: ["exe"] },
+      { name: i18n._(msgFilterAllFiles), extensions: ["*"] },
     ],
   });
   return selected ?? null;

@@ -1,3 +1,7 @@
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { ReactNode } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -16,8 +20,8 @@ import type { AccessEntryInput } from "./types";
 import type { AccessType, RestartPolicy } from "@/lib/tauri-cfm";
 
 function EntrySwitchRow(props: {
-  title: string;
-  description?: string;
+  title: ReactNode;
+  description?: ReactNode;
   checked: boolean;
   disabled: boolean;
   onCheckedChange: (checked: boolean) => void;
@@ -28,7 +32,7 @@ function EntrySwitchRow(props: {
     <div
       className={cn(
         "flex flex-col gap-2.5 px-3 py-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:py-3",
-        className
+        className,
       )}
     >
       <div className="min-w-0 flex-1 space-y-1 pt-0.5">
@@ -47,6 +51,8 @@ function EntrySwitchRow(props: {
   );
 }
 
+const msgConsoleToast = msg`Stop the tunnel, then Start again for the console window setting to take effect.`;
+
 export function EntryForm(props: {
   value: AccessEntryInput;
   isEditMode: boolean;
@@ -57,12 +63,13 @@ export function EntryForm(props: {
   onReset: () => void;
   submitLabel: string;
 }) {
+  const { i18n } = useLingui();
   const { value, isEditMode, canEdit, onChange, onEdit, onSubmit, onReset, submitLabel } = props;
 
   return (
     <div className="space-y-3">
       <Input
-        placeholder="Name"
+        placeholder={i18n._(msg`Name`)}
         value={value.name}
         disabled={!canEdit}
         onChange={(e) => onChange({ ...value, name: e.target.value })}
@@ -74,7 +81,7 @@ export function EntryForm(props: {
           onValueChange={(v) => onChange({ ...value, access_type: v as AccessType })}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Access type" />
+            <SelectValue placeholder={i18n._(msg`Access type`)} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="http">HTTP</SelectItem>
@@ -90,23 +97,29 @@ export function EntryForm(props: {
           onValueChange={(v) => onChange({ ...value, restart_policy: v as RestartPolicy })}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Restart" />
+            <SelectValue placeholder={i18n._(msg`Restart`)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="never">Never</SelectItem>
-            <SelectItem value="on_failure">On failure</SelectItem>
-            <SelectItem value="always">Always</SelectItem>
+            <SelectItem value="never">
+              <Trans>Never</Trans>
+            </SelectItem>
+            <SelectItem value="on_failure">
+              <Trans>On failure</Trans>
+            </SelectItem>
+            <SelectItem value="always">
+              <Trans>Always</Trans>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
       <Input
-        placeholder="Hostname (example.com)"
+        placeholder={i18n._(msg`Hostname (example.com)`)}
         value={value.hostname}
         disabled={!canEdit}
         onChange={(e) => onChange({ ...value, hostname: e.target.value })}
       />
       <Input
-        placeholder="Target (127.0.0.1:3000)"
+        placeholder={i18n._(msg`Target (127.0.0.1:3000)`)}
         value={value.target}
         disabled={!canEdit}
         onChange={(e) => onChange({ ...value, target: e.target.value })}
@@ -114,34 +127,39 @@ export function EntryForm(props: {
 
       <div className="space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Route options
+          <Trans>Route options</Trans>
         </p>
         <div className="overflow-hidden rounded-xl border border-border/80 bg-muted/20 shadow-sm dark:bg-muted/10">
           <div className="divide-y divide-border/70">
             <EntrySwitchRow
-              title="Enabled"
-              description="When off, this route is skipped and won’t start with the app."
+              title={<Trans>Enabled</Trans>}
+              description={
+                <Trans>When off, this route is skipped and won’t start with the app.</Trans>
+              }
               checked={value.enabled}
               disabled={!canEdit}
               onCheckedChange={(checked) => onChange({ ...value, enabled: Boolean(checked) })}
             />
             <EntrySwitchRow
-              title="Autostart"
-              description="Start this tunnel automatically when CFM launches."
+              title={<Trans>Autostart</Trans>}
+              description={<Trans>Start this tunnel automatically when CFM launches.</Trans>}
               checked={value.autostart}
               disabled={!canEdit}
               onCheckedChange={(checked) => onChange({ ...value, autostart: Boolean(checked) })}
             />
             <EntrySwitchRow
-              title="Show cloudflared console"
-              description="Opens a separate terminal window for this process (Windows). Changing this requires stopping and starting the tunnel again."
+              title={<Trans>Show cloudflared console</Trans>}
+              description={
+                <Trans>
+                  Opens a separate terminal window for this process (Windows). Changing this
+                  requires stopping and starting the tunnel again.
+                </Trans>
+              }
               checked={value.show_process_terminal}
               disabled={!canEdit}
               onCheckedChange={(checked) => {
                 onChange({ ...value, show_process_terminal: Boolean(checked) });
-                toast.info(
-                  "Stop the tunnel, then Start again for the console window setting to take effect.",
-                );
+                toast.info(i18n._(msgConsoleToast));
               }}
             />
           </div>
@@ -151,7 +169,7 @@ export function EntryForm(props: {
       <div className="flex flex-wrap gap-2">
         {isEditMode && !canEdit && (
           <Button variant="secondary" onClick={onEdit}>
-            Edit
+            <Trans>Edit</Trans>
           </Button>
         )}
         {(!isEditMode || canEdit) && (
@@ -160,7 +178,7 @@ export function EntryForm(props: {
           </Button>
         )}
         <Button variant="outline" onClick={onReset}>
-          Reset
+          <Trans>Reset</Trans>
         </Button>
       </div>
     </div>

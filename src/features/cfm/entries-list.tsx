@@ -1,6 +1,10 @@
+import { useLingui } from "@lingui/react";
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import { Play, Square, RotateCcw, Trash2 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Play, Square, RotateCcw, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +19,14 @@ import {
 
 import type { AccessEntry, RuntimeEntry } from "./types";
 
+const statusMessages = {
+  stopped: msg`Stopped`,
+  starting: msg`Starting`,
+  running: msg`Running`,
+  stopping: msg`Stopping`,
+  failed: msg`Failed`,
+} as const;
+
 export function EntriesList(props: {
   entries: AccessEntry[];
   runtime: Record<string, RuntimeEntry>;
@@ -25,6 +37,7 @@ export function EntriesList(props: {
   onRestart: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
+  const { i18n } = useLingui();
   const {
     entries,
     runtime,
@@ -42,6 +55,9 @@ export function EntriesList(props: {
         const currentStatus = runtime[entry.id]?.status ?? "stopped";
         const isRunning = currentStatus === "running";
         const isSelected = selectedId === entry.id;
+        const statusLabel = i18n._(
+          statusMessages[currentStatus as keyof typeof statusMessages] ?? statusMessages.stopped,
+        );
         return (
           <div
             key={entry.id}
@@ -59,8 +75,11 @@ export function EntriesList(props: {
                   {entry.access_type.toUpperCase()} - {entry.hostname} - {entry.target}
                 </div>
               </div>
-              <Badge variant={currentStatus === "running" ? "default" : "outline"} className="capitalize">
-                {currentStatus}
+              <Badge
+                variant={currentStatus === "running" ? "default" : "outline"}
+                className="capitalize"
+              >
+                {statusLabel}
               </Badge>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -68,8 +87,8 @@ export function EntriesList(props: {
                 <Button
                   size="icon-lg"
                   variant="secondary"
-                  title="Start"
-                  aria-label="Start"
+                  title={i18n._(msg`Start`)}
+                  aria-label={i18n._(msg`Start`)}
                   onClick={(event) => {
                     event.stopPropagation();
                     onStart(entry.id);
@@ -82,8 +101,8 @@ export function EntriesList(props: {
                   <Button
                     size="icon-lg"
                     variant="outline"
-                    title="Stop"
-                    aria-label="Stop"
+                    title={i18n._(msg`Stop`)}
+                    aria-label={i18n._(msg`Stop`)}
                     onClick={(event) => {
                       event.stopPropagation();
                       onStop(entry.id);
@@ -94,8 +113,8 @@ export function EntriesList(props: {
                   <Button
                     size="icon-lg"
                     variant="outline"
-                    title="Restart"
-                    aria-label="Restart"
+                    title={i18n._(msg`Restart`)}
+                    aria-label={i18n._(msg`Restart`)}
                     onClick={(event) => {
                       event.stopPropagation();
                       onRestart(entry.id);
@@ -110,8 +129,8 @@ export function EntriesList(props: {
                   <Button
                     size="icon-lg"
                     variant="destructive"
-                    title="Delete"
-                    aria-label="Delete"
+                    title={i18n._(msg`Delete`)}
+                    aria-label={i18n._(msg`Delete`)}
                     onClick={(event) => event.stopPropagation()}
                   >
                     <Trash2 className="size-4" />
@@ -119,14 +138,18 @@ export function EntriesList(props: {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete entry?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      <Trans>Delete entry?</Trans>
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently remove <strong>{entry.name}</strong>.
+                      <Trans>
+                        This will permanently remove <strong>{entry.name}</strong>.
+                      </Trans>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel onClick={(event) => event.stopPropagation()}>
-                      Cancel
+                      <Trans>Cancel</Trans>
                     </AlertDialogCancel>
                     <AlertDialogAction
                       variant="destructive"
@@ -135,7 +158,7 @@ export function EntriesList(props: {
                         onDelete(entry.id);
                       }}
                     >
-                      Delete
+                      <Trans>Delete</Trans>
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -147,4 +170,3 @@ export function EntriesList(props: {
     </div>
   );
 }
-
