@@ -2,8 +2,8 @@
 
 🔨 Other Changes
 
-- Update cfm package version to 0.4.3 in Cargo.lock ([efabe0d](../../commit/efabe0d))
-- Bump version to 0.4.3 in package.json, tauri.conf.json, and Cargo files ([e24d083](../../commit/e24d083))
+- Add mainBinaryName to tauri configuration ([1882595](../../commit/1882595))
+- Bump version to 0.4.4 in package.json, tauri.conf.json, and Cargo files ([f97f8d8](../../commit/f97f8d8))
 
 
-📋 Full Changelog: [e24d083...efabe0d](../../compare/e24d083...efabe0d)
+📋 Full Changelog: [f97f8d8...1882595](../../compare/f97f8d8...1882595)
