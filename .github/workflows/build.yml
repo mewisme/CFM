@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0  # Fetch all history for changelog generation
+          fetch-depth: 0
 
       - name: Setup node
         uses: actions/setup-node@v6
@@ -74,16 +74,12 @@ jobs:
 
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-      # End ----------------------------------
 
-      # Update Tauri pubkey start ----------------------------------
       - name: Update Tauri pubkey
         env:
           TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
         run: node scripts/update-tauri-pubkey.js
-      # End ----------------------------------
 
-      # Generate changelog start ----------------------------------
       - name: Generate Changelog
         id: generate_changelog
         shell: bash
@@ -92,10 +88,7 @@ jobs:
           echo "CHANGELOG<<EOF" >> $GITHUB_ENV
           echo "$CHANGELOG_CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-      # End ----------------------------------
 
-
-      # Build and upload release
       - uses: tauri-apps/tauri-action@v0
         name: Build and upload release
         id: tauri_build

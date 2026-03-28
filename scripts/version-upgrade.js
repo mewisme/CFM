@@ -13,6 +13,7 @@ const __dirname = dirname(__filename);
 const packageJsonPath = join(process.cwd(), 'package.json');
 const versionLockPath = join(process.cwd(), '.version-lock');
 const tauriConfigPath = join(process.cwd(), 'src-tauri', 'tauri.conf.json');
+const cargoTomlPath = join(process.cwd(), 'src-tauri', 'Cargo.toml');
 
 // Read current version from package.json
 const packageJson = process.env.CURRENT_VERSION ? process.env.CURRENT_VERSION : JSON.parse(readFileSync(packageJsonPath, 'utf8'));
@@ -27,6 +28,32 @@ function updateTauriConfig(version) {
     console.log('Updated Tauri config version');
   } catch (error) {
     console.error('Error updating Tauri config:', error.message);
+  }
+}
+
+// Update [package].version in Cargo.toml (only the workspace crate version, not dependency specs)
+function updateCargoToml(version) {
+  try {
+    const content = readFileSync(cargoTomlPath, 'utf8');
+    const lines = content.split('\n');
+    let inPackage = false;
+    const next = lines.map((line) => {
+      if (inPackage && /^\s*\[.+\]\s*$/.test(line)) {
+        inPackage = false;
+      }
+      if (line.trim() === '[package]') {
+        inPackage = true;
+        return line;
+      }
+      if (inPackage && /^\s*version\s*=\s*"/.test(line)) {
+        return line.replace(/^\s*version\s*=\s*"[^"]*"/, `version = "${version}"`);
+      }
+      return line;
+    });
+    writeFileSync(cargoTomlPath, next.join('\n'));
+    console.log('Updated Cargo.toml package version');
+  } catch (error) {
+    console.error('Error updating Cargo.toml:', error.message);
   }
 }
 
@@ -51,7 +78,7 @@ function saveLastProcessedCommit() {
 // Get commits since last processed commit
 function getNewCommits() {
   const lastProcessedCommit = getLastProcessedCommit();
-  
+
   try {
     if (lastProcessedCommit) {
       // Get commits since last processed commit, excluding the last processed commit itself
@@ -105,17 +132,17 @@ function analyzeCommits(commits) {
   let tempMajor = major;
   let tempMinor = minor;
   let tempPatch = patch;
-  
+
   console.log('\nAnalyzing commits with potential version changes:');
   commits.forEach(commit => {
     const lowerCommit = commit.toLowerCase();
     const firstWord = lowerCommit.split(' ')[0];
     let commitBumpType = 'none';
 
-    if (lowerCommit.startsWith('skip') || lowerCommit.includes('bump new version') || lowerCommit.includes('skip:')) {
+    if (lowerCommit.startsWith('skip') || lowerCommit.includes('bump new version') || lowerCommit.includes('bump version') || lowerCommit.includes('skip:')) {
       return;
     }
-    
+
     // Check for breaking changes - highest priority
     if (lowerCommit.includes('breaking change') || lowerCommit.includes('!:')) {
       commitBumpType = 'major';
@@ -128,7 +155,7 @@ function analyzeCommits(commits) {
     }
     // Check for features - medium priority
     else if (
-      lowerCommit.startsWith('feat:') || 
+      lowerCommit.startsWith('feat:') ||
       lowerCommit.startsWith('feature:') ||
       featureVerbs.some(verb => firstWord === verb)
     ) {
@@ -177,7 +204,7 @@ function analyzeCommits(commits) {
 // Update version based on commit analysis
 function updateVersion() {
   const commits = getNewCommits();
-  
+
   if (commits.length === 0) {
     console.log('No new commits to analyze');
     return null;
@@ -218,13 +245,16 @@ if (newVersion) {
   // Update package.json
   packageJson.version = newVersion;
   writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-  
+
   // Update Tauri config version
   updateTauriConfig(newVersion);
-  
+
+  // Update Rust crate package version
+  updateCargoToml(newVersion);
+
   // Save the current commit as last processed
   saveLastProcessedCommit();
-  
+
   console.log(`Version upgraded to ${newVersion}`);
   console.log('Last processed commit saved to .version-lock');
 } 
