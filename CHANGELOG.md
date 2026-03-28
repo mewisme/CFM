@@ -1,13 +1,12 @@
 ## What's Changed
 
-✨ Features
+♻️ Refactoring
 
-- Add positioner plugin and integrate window positioning functionality ([5cad06b](../../commit/5cad06b))
+- Remove unused components and streamline app structure ([98376e9](../../commit/98376e9))
 
 🔨 Other Changes
 
-- Update GitHub Actions build workflow to reintroduce Windows target ([a65ac05](../../commit/a65ac05))
-- Bump version to 0.3.7 in package.json and tauri.conf.json ([230add9](../../commit/230add9))
+- Bump version to 0.4.1 in package.json, tauri.conf.json, and Cargo files ([e9f0eff](../../commit/e9f0eff))
 
 
-📋 Full Changelog: [230add9...5cad06b](../../compare/230add9...5cad06b)
+📋 Full Changelog: [e9f0eff...98376e9](../../compare/e9f0eff...98376e9)
