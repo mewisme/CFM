@@ -2,7 +2,7 @@
 
 🔨 Other Changes
 
-- Integrate Lingui for internationalization support ([c1225ad](../../commit/c1225ad))
+- Bump version to 0.7.2 and update changelog for Lingui integration ([cabd2d7](../../commit/cabd2d7))
 
 
-📋 Full Changelog: [c1225ad...c1225ad](../../compare/c1225ad...c1225ad)
+📋 Full Changelog: [cabd2d7...cabd2d7](../../compare/cabd2d7...cabd2d7)

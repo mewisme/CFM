@@ -139,7 +139,7 @@ function analyzeCommits(commits) {
     const firstWord = lowerCommit.split(' ')[0];
     let commitBumpType = 'none';
 
-    if (lowerCommit.startsWith('skip') || lowerCommit.includes('bump new version') || lowerCommit.includes('bump version') || lowerCommit.includes('skip:')) {
+    if (lowerCommit.startsWith('skip') || lowerCommit.includes('bump new version') || lowerCommit.includes('bump version') || lowerCommit.includes('skip:') || lowerCommit.includes('update version')) {
       return;
     }
 
