@@ -1,6 +1,6 @@
 [package]
 name = "cfm"
-version = "0.4.5"
+version = "0.4.6"
 description = "cfm"
 authors = ["mewisme"]
 edition = "2021"

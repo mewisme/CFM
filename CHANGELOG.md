@@ -1,9 +1,12 @@
 ## What's Changed
 
+🐛 Bug Fixes
+
+- Handle error when disabling autostart if not previously set ([ae94a93](../../commit/ae94a93))
+
 🔨 Other Changes
 
-- Add mainBinaryName to tauri configuration ([1882595](../../commit/1882595))
-- Bump version to 0.4.4 in package.json, tauri.conf.json, and Cargo files ([f97f8d8](../../commit/f97f8d8))
+- Bump version to 0.4.5 in package.json, tauri.conf.json, and Cargo files ([2ac24af](../../commit/2ac24af))
 
 
-📋 Full Changelog: [f97f8d8...1882595](../../compare/f97f8d8...1882595)
+📋 Full Changelog: [2ac24af...ae94a93](../../compare/2ac24af...ae94a93)
