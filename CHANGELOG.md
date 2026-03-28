@@ -2,11 +2,11 @@
 
 ♻️ Refactoring
 
-- Update index.html and tauri.conf.json for application branding ([9191370](../../commit/9191370))
+- Remove HTTP access type from application ([7ad05ca](../../commit/7ad05ca))
 
 🔨 Other Changes
 
-- Bump version to 0.8.1 and update changelog for release ([1607771](../../commit/1607771))
+- Bump version to 0.8.2 and update changelog for release ([4e4c214](../../commit/4e4c214))
 
 
-📋 Full Changelog: [1607771...9191370](../../compare/1607771...9191370)
+📋 Full Changelog: [4e4c214...7ad05ca](../../compare/4e4c214...7ad05ca)
