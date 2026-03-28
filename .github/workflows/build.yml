@@ -17,11 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - platform: 'macos-latest' # for Arm based macs (M1 and above)
-          #   args: '--target aarch64-apple-darwin'
-          # - platform: 'macos-latest' # for Intel based macs
-          #   args: '--target x86_64-apple-darwin'
-          - platform: 'windows-latest'
+          # - platform: 'windows-latest'
+          - platform: 'self-hosted'
             args: ''
 
     runs-on: ${{ matrix.platform }}
@@ -57,7 +54,7 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ''
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -69,7 +66,6 @@ jobs:
 
       - name: Generate app version from package.json
         id: get_version
-        # if: matrix.platform == 'macos-latest'
         shell: bash
         run: |
           VERSION=$(node -p "require('./package.json').version")
@@ -91,7 +87,6 @@ jobs:
       # Generate changelog start ----------------------------------
       - name: Generate Changelog
         id: generate_changelog
-        if: matrix.platform == 'windows-latest'
         shell: bash
         run: |
           CHANGELOG_CONTENT=$(cat CHANGELOG.md)
