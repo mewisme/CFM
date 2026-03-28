@@ -5,9 +5,7 @@ use std::time::Duration;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::webview::WebviewWindowBuilder;
-use tauri::AppHandle;
 use tauri::Manager;
-use tauri::WebviewUrl;
 use tauri::WindowEvent;
 
 mod app;
@@ -37,50 +35,11 @@ impl ExitCoordinator {
     }
 }
 
-/// Runs when another process tried to start the app; the duplicate exits and this runs on the
-/// primary instance. See <https://v2.tauri.app/plugin/single-instance/> ("Focusing on New Instance").
-#[cfg(desktop)]
-fn on_secondary_instance_attempt(app: &AppHandle) {
-    let main = app.get_webview_window("main").expect("no main window");
-    let _ = main.show();
-    let _ = main.set_focus();
-
-    if let Some(notice) = app.get_webview_window("single-instance-notice") {
-        let _ = notice.show();
-        let _ = notice.set_focus();
-        return;
-    }
-
-    let _ = WebviewWindowBuilder::new(
-        app,
-        "single-instance-notice",
-        WebviewUrl::App("single-instance.html".into()),
-    )
-    .title("Cloudflared Access Manager")
-    .inner_size(360.0, 400.0)
-    .center()
-    .resizable(false)
-    .decorations(true)
-    .always_on_top(true)
-    .build();
-}
-
 pub fn run() {
     let cfm_state = commands::cfm::CfmAppState::default();
-    let mut builder = tauri::Builder::default()
+    tauri::Builder::default()
         .manage(cfm_state.clone())
-        .plugin(tauri_plugin_positioner::init());
-
-    // Single Instance must be registered first — see
-    // <https://v2.tauri.app/plugin/single-instance/#setup>
-    #[cfg(desktop)]
-    {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            on_secondary_instance_attempt(app);
-        }));
-    }
-
-    builder
+        .plugin(tauri_plugin_positioner::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
@@ -102,6 +61,16 @@ pub fn run() {
             cfm_state
                 .init(service)
                 .expect("CFM service should initialize exactly once");
+
+            let main_cfg = app
+                .config()
+                .app
+                .windows
+                .iter()
+                .find(|w| w.label == "main")
+                .expect(r#"tauri.conf must include a window with label "main""#);
+            WebviewWindowBuilder::from_config(app.handle(), main_cfg)?.build()?;
+
             app.manage(ExitCoordinator::new());
 
             let show_item = MenuItemBuilder::with_id("tray_show", "Show/Hide").build(app)?;

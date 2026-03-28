@@ -2,7 +2,7 @@ AGENTS.md — Repo agent guidance
 
 ## Project overview
 
-**CFM (Cloudflared Access Manager)** is a Tauri v2 desktop app that manages Cloudflare Access tunnel entries: persisted configuration in SQLite, supervised `cloudflared` processes, system tray, optional splash flow, and single-instance behavior (second launch focuses the existing window).
+**CFM (Cloudflared Access Manager)** is a Tauri v2 desktop app that manages Cloudflare Access tunnel entries: persisted configuration in SQLite, supervised `cloudflared` processes, system tray, and optional splash flow.
 
 The UI is React 19 + TypeScript + Vite; persistence and CRUD use the **Tauri SQL plugin** on the frontend (`@tauri-apps/plugin-sql`). Custom Rust code lives under `src-tauri/src/` (commands, `CfmService`, process supervisor).
 
@@ -13,13 +13,13 @@ The UI is React 19 + TypeScript + Vite; persistence and CRUD use the **Tauri SQL
 - **State**: Jotai (`src/stores/`)
 - **Routing**: React Router v7
 - **Backend**: Tauri v2 + Rust
-- **Notable Tauri plugins** (see `src-tauri/src/lib.rs`): `tauri-plugin-sql`, `tauri-plugin-updater`, `tauri-plugin-autostart`, `tauri-plugin-single-instance`, plus opener, shell, dialog, process, OS, notification, clipboard
+- **Notable Tauri plugins** (see `src-tauri/src/lib.rs`): `tauri-plugin-sql`, `tauri-plugin-updater`, `tauri-plugin-autostart`, plus opener, shell, dialog, process, OS, notification, clipboard
 
 ## Code structure
 
 ```
 scripts/                 # Version bump, changelog, rename
-public/                  # Static web assets (e.g. splash, single-instance notice)
+public/                  # Static web assets (e.g. splash)
 src/
 ├── components/          # Shared layout, theme, error boundary; ui/ = shadcn-style primitives
 ├── features/            # Feature areas (e.g. features/cfm/, features/titlebar/, features/updater/)

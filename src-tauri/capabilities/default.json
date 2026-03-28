@@ -3,15 +3,13 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": [
-    "main",
-    "single-instance-notice"
+    "main"
   ],
   "permissions": [
     "core:default",
     "dialog:allow-open",
     "dialog:allow-save",
     "dialog:default",
-    "core:webview:allow-create-webview-window",
     "core:window:allow-close",
     "updater:default",
     "process:default",

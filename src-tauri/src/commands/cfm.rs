@@ -7,8 +7,10 @@ use uuid::Uuid;
 use crate::app::service::CfmService;
 use crate::domain::types::{AccessEntry, RuntimeEntry};
 
-/// Registered with `tauri::Builder::manage` before webviews load; the inner service is set from
-/// `lib::run`'s setup hook (Tauri 2 creates windows before running that hook, so IPC can race otherwise).
+/// Registered with `tauri::Builder::manage` before webviews load; the inner service is set at the
+/// start of `lib::run`'s setup hook. The `main` window uses `create: false` and is opened only after
+/// init so its webview cannot invoke commands before the service exists (Tauri creates `create: true`
+/// windows before the setup hook runs).
 #[derive(Clone, Default)]
 pub struct CfmAppState {
     service: Arc<OnceLock<Arc<CfmService>>>,
