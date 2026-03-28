@@ -2,8 +2,8 @@
 
 🔨 Other Changes
 
-- Keep main hidden when starting in tray at login ([c7e408c](../../commit/c7e408c))
-- Bump version to 0.6.1 in package.json, tauri.conf.json, and Cargo files ([aacb23f](../../commit/aacb23f))
+- Update splash_close command to use Option for show_main ([4efb06d](../../commit/4efb06d))
+- Bump version to 0.6.2 in package.json, tauri.conf.json, and Cargo files ([ddd5ddd](../../commit/ddd5ddd))
 
 
-📋 Full Changelog: [aacb23f...c7e408c](../../compare/aacb23f...c7e408c)
+📋 Full Changelog: [ddd5ddd...4efb06d](../../compare/ddd5ddd...4efb06d)
