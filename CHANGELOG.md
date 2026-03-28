@@ -1,13 +1,9 @@
 ## What's Changed
 
-🐛 Bug Fixes
-
-- Update button styles for macOS and Windows titlebars ([394f58d](../../commit/394f58d))
-
 🔨 Other Changes
 
-- Update GitHub Actions build workflow for macOS targets ([9269812](../../commit/9269812))
-- Bump version to 0.3.2 in package.json and tauri.conf.json ([38a477c](../../commit/38a477c))
+- Update GitHub Actions build workflow to remove macOS targets ([58b91c9](../../commit/58b91c9))
+- Bump version to 0.3.5 in package.json and tauri.conf.json ([074d9ec](../../commit/074d9ec))
 
 
-📋 Full Changelog: [38a477c...394f58d](../../compare/38a477c...394f58d)
+📋 Full Changelog: [074d9ec...58b91c9](../../compare/074d9ec...58b91c9)
