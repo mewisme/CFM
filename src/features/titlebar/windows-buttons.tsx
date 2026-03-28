@@ -34,8 +34,7 @@ export function WindowsButtons() {
         onClick={handleMinimize}
         title="Minimize"
         aria-label="Minimize window"
-        className={`cursor-pointer w-[46px] h-full flex items-center justify-center text-foreground hover:bg-accent transition-colors ${!isFocused ? 'opacity-50' : ''
-          }`}
+        className={`cursor-pointer w-[46px] h-full flex items-center justify-center text-foreground hover:bg-accent transition-colors focus:outline-none ${!isFocused ? 'opacity-50' : ''}`}
       >
         <Minus size={16} />
       </button>
@@ -43,8 +42,7 @@ export function WindowsButtons() {
         onClick={handleMaximize}
         title="Maximize"
         aria-label="Maximize window"
-        className={`cursor-pointer w-[46px] h-full flex items-center justify-center text-foreground hover:bg-accent transition-colors ${!isFocused ? 'opacity-50' : ''
-          }`}
+        className={`cursor-pointer w-[46px] h-full flex items-center justify-center text-foreground hover:bg-accent transition-colors focus:outline-none ${!isFocused ? 'opacity-50' : ''}`}
       >
         <Square size={14} />
       </button>
@@ -52,8 +50,7 @@ export function WindowsButtons() {
         onClick={handleClose}
         title="Hide to tray"
         aria-label="Hide window to system tray"
-        className={`cursor-pointer w-[46px] h-full flex items-center justify-center text-foreground hover:bg-[#e81123] hover:text-white active:bg-[#c50f1f] transition-colors ${!isFocused ? 'opacity-50' : ''
-          }`}
+        className={`cursor-pointer w-[46px] h-full flex items-center justify-center text-foreground hover:bg-[#e81123] hover:text-white active:bg-[#c50f1f] transition-colors focus:outline-none ${!isFocused ? 'opacity-50' : ''}`}
       >
         <X size={16} />
       </button>
