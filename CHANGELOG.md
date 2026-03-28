@@ -1,12 +1,8 @@
 ## What's Changed
 
-✨ Features
-
-- Enhance CFM app with settings management and UI improvements ([1779db0](../../commit/1779db0))
-
 🔨 Other Changes
 
-- Bump version to 0.2.6 in package.json and tauri.conf.json ([66169b8](../../commit/66169b8))
+- Bump version to 0.3.1 in package.json and tauri.conf.json ([7179f9c](../../commit/7179f9c))
 
 
-📋 Full Changelog: [66169b8...1779db0](../../compare/66169b8...1779db0)
+📋 Full Changelog: [7179f9c...7179f9c](../../compare/7179f9c...7179f9c)
