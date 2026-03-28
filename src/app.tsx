@@ -17,11 +17,14 @@ function App() {
       invoke<boolean>('app_is_login_autostart_launch'),
       getAppSettings(),
     ]);
-    await invoke("splash_close");
-    if (isLoginAutostart && appSettings.autostart_minimized) {
+    const startInTray =
+      isLoginAutostart && appSettings.autostart_minimized;
+    await invoke('splash_close', { showMain: !startInTray });
+    if (startInTray) {
       await getCurrentWindow().hide();
+    } else {
+      await moveWindow(Position.Center);
     }
-    await moveWindow(Position.Center);
   }
 
   useEffect(() => {
