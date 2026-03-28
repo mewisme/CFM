@@ -40,7 +40,6 @@ pub struct AccessEntry {
     pub enabled: bool,
     #[serde(default)]
     pub show_process_terminal: bool,
-    pub notes: Option<String>,
     pub created_at: String,
     pub updated_at: String,
 }

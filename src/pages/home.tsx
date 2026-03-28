@@ -20,6 +20,7 @@ import {
 } from "@/lib/tauri-cfm";
 import { EntriesList } from "@/features/cfm/entries-list";
 import { EntryForm } from "@/features/cfm/entry-form";
+import { CFM_DATABASE_CLEARED_EVENT } from "@/lib/database";
 import { cn } from "@/lib/utils";
 
 const defaultForm: AccessEntryInput = {
@@ -129,6 +130,17 @@ export default function Home() {
     setSelectedId("");
     setFormOpen(false);
   }
+
+  useEffect(() => {
+    function onDatabaseCleared(): void {
+      void refreshEntries();
+      void refreshRuntime();
+      closeFormPanel();
+    }
+    window.addEventListener(CFM_DATABASE_CLEARED_EVENT, onDatabaseCleared);
+    return () => window.removeEventListener(CFM_DATABASE_CLEARED_EVENT, onDatabaseCleared);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function openNewEntry() {
     resetForm();

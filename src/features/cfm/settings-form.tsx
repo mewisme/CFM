@@ -3,6 +3,17 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,8 +47,9 @@ export function SettingsForm(props: {
   value: AppSettings;
   onChange: (next: AppSettings) => void;
   onSave: () => void;
+  onClearLocalData: () => void | Promise<void>;
 }) {
-  const { value, onChange, onSave } = props;
+  const { value, onChange, onSave, onClearLocalData } = props;
   const { theme, setTheme } = useTheme();
   const [themeReady, setThemeReady] = useState(false);
 
@@ -143,6 +155,42 @@ export function SettingsForm(props: {
       <Button className="w-full sm:w-auto" onClick={onSave}>
         Save settings
       </Button>
+
+      <div className="flex flex-col gap-3 border-t border-border pt-4">
+        <div className="space-y-1">
+          <div className="text-sm font-medium">Local data</div>
+          <p className="text-xs text-muted-foreground">
+            Remove all saved entries and settings from this device and recreate an empty database.
+            Restart the app if tunnels were running.
+          </p>
+        </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button type="button" variant="destructive" className="w-full sm:w-auto">
+              Clear local data
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Clear all local data?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This deletes the tunnel entries and app settings stored in CFM&apos;s database on
+                this device. This cannot be undone. If any tunnels are running, close them or
+                restart the app afterward.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                onClick={() => void onClearLocalData()}
+              >
+                Clear data
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 }

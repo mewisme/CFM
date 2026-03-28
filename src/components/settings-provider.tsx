@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SettingsForm } from "@/features/cfm/settings-form";
+import { clearCfmDatabase } from "@/lib/database";
 import { cfmApi, type AppSettings } from "@/lib/tauri-cfm";
 import {
   applyLaunchAtLoginPreference,
@@ -93,6 +94,18 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }
   }, [settings]);
 
+  const clearLocalData = useCallback(async () => {
+    try {
+      await clearCfmDatabase();
+      await refreshSettings();
+      toast.success("Local data cleared");
+      setDialogOpen(false);
+    } catch (error) {
+      console.error(error);
+      toast.error(String(error));
+    }
+  }, [refreshSettings]);
+
   const value = useMemo(
     () => ({
       settings,
@@ -117,7 +130,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
               Application and cloudflared preferences
             </DialogDescription>
           </DialogHeader>
-          <SettingsForm value={settings} onChange={setSettings} onSave={() => void saveSettings()} />
+          <SettingsForm
+            value={settings}
+            onChange={setSettings}
+            onSave={() => void saveSettings()}
+            onClearLocalData={() => void clearLocalData()}
+          />
         </DialogContent>
       </Dialog>
     </AppSettingsContext.Provider>

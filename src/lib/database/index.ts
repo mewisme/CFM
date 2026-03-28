@@ -1,7 +1,13 @@
 /**
  * Database module: `db.ts` (connection), `migration.ts` (all DDL), and one file per table for CRUD.
  */
-export { CFM_DB_URL, getDb, initCfmDatabase } from "./db";
+export {
+  CFM_DATABASE_CLEARED_EVENT,
+  CFM_DB_URL,
+  clearCfmDatabase,
+  getDb,
+  initCfmDatabase,
+} from "./db";
 export { runMigrations, type TableMigration } from "./migration";
 export {
   ACCESS_ENTRIES_TABLE,

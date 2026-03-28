@@ -17,8 +17,9 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 const MIGRATIONS: TableMigration[] = [
   {
     version: 1,
-    description: "create_access_entries",
-    sql: `CREATE TABLE IF NOT EXISTS access_entries (
+    description: "initial_schema",
+    sql: `
+CREATE TABLE IF NOT EXISTS access_entries (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   access_type TEXT NOT NULL,
@@ -27,29 +28,16 @@ const MIGRATIONS: TableMigration[] = [
   autostart INTEGER NOT NULL DEFAULT 0,
   restart_policy TEXT NOT NULL,
   enabled INTEGER NOT NULL DEFAULT 1,
-  tray_pinned INTEGER NOT NULL DEFAULT 0,
-  notes TEXT,
+  show_process_terminal INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
-);`,
-  },
-  {
-    version: 2,
-    description: "create_app_settings",
-    sql: `CREATE TABLE IF NOT EXISTS app_settings (
+);
+
+CREATE TABLE IF NOT EXISTS app_settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
-);`,
-  },
-  {
-    version: 3,
-    description: "add_show_process_terminal",
-    sql: `ALTER TABLE access_entries ADD COLUMN show_process_terminal INTEGER NOT NULL DEFAULT 0;`,
-  },
-  {
-    version: 4,
-    description: "drop_tray_pinned",
-    sql: `ALTER TABLE access_entries DROP COLUMN tray_pinned;`,
+);
+`,
   },
 ].sort((a, b) => a.version - b.version);
 
@@ -71,4 +59,14 @@ export async function runMigrations(db: Database): Promise<void> {
       [m.version, m.description, new Date().toISOString()]
     );
   }
+
+  await dropLegacyNotesColumnIfPresent(db);
+}
+
+async function dropLegacyNotesColumnIfPresent(db: Database): Promise<void> {
+  const cols = await db.select<{ name: string }[]>("PRAGMA table_info(access_entries)");
+  if (cols.length === 0 || !cols.some((c) => c.name === "notes")) {
+    return;
+  }
+  await db.execute("ALTER TABLE access_entries DROP COLUMN notes");
 }

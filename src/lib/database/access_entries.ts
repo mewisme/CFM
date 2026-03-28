@@ -18,7 +18,6 @@ export interface AccessEntry {
   enabled: boolean;
   /** When true, cloudflared runs in its own console (Windows). Requires stop/start to apply. */
   show_process_terminal: boolean;
-  notes?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -37,7 +36,7 @@ export interface AccessEntryInput {
 const T = ACCESS_ENTRIES_TABLE;
 
 const ENTRY_COLUMNS =
-  "id, name, access_type, hostname, target, autostart, restart_policy, enabled, show_process_terminal, notes, created_at, updated_at";
+  "id, name, access_type, hostname, target, autostart, restart_policy, enabled, show_process_terminal, created_at, updated_at";
 
 function mapRowToEntry(row: Record<string, unknown>): AccessEntry {
   return {
@@ -53,7 +52,6 @@ function mapRowToEntry(row: Record<string, unknown>): AccessEntry {
       row.show_process_terminal !== undefined && row.show_process_terminal !== null
         ? Number(row.show_process_terminal) !== 0
         : false,
-    notes: row.notes != null ? String(row.notes) : null,
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),
   };
