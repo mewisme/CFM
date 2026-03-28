@@ -1,12 +1,9 @@
 ## What's Changed
 
-✨ Features
-
-- Add tauri-plugin-single-instance for single instance application support ([e75950c](../../commit/e75950c))
-
 🔨 Other Changes
 
-- Bump version to 0.5.2 in package.json, tauri.conf.json, and Cargo files ([191696b](../../commit/191696b))
+- Import runMigrations directly in getDb function ([b42512a](../../commit/b42512a))
+- Bump version to 0.6.0 in package.json, tauri.conf.json, and Cargo files ([a260938](../../commit/a260938))
 
 
-📋 Full Changelog: [191696b...e75950c](../../compare/191696b...e75950c)
+📋 Full Changelog: [a260938...b42512a](../../compare/a260938...b42512a)
