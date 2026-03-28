@@ -2,11 +2,11 @@
 
 ♻️ Refactoring
 
-- Remove unused components and streamline app structure ([98376e9](../../commit/98376e9))
+- Remove single-instance plugin and associated files ([4a2fdab](../../commit/4a2fdab))
 
 🔨 Other Changes
 
-- Bump version to 0.4.1 in package.json, tauri.conf.json, and Cargo files ([e9f0eff](../../commit/e9f0eff))
+- Bump version to 0.4.2 in package.json, tauri.conf.json, and Cargo files ([ff8db7d](../../commit/ff8db7d))
 
 
-📋 Full Changelog: [e9f0eff...98376e9](../../compare/e9f0eff...98376e9)
+📋 Full Changelog: [ff8db7d...4a2fdab](../../compare/ff8db7d...4a2fdab)
