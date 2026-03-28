@@ -1,7 +1,7 @@
 import Database from "@tauri-apps/plugin-sql";
 import { invoke } from "@tauri-apps/api/core";
 
-/** Relative to app config dir; must match `sql.preload` in tauri.conf.json. */
+/** Relative to app config dir; must match any `plugins.sql.preload` entry in tauri.conf.json. */
 export const CFM_DB_URL = "sqlite:cfm.sqlite3" as const;
 
 /** Dispatched on `window` after {@link clearCfmDatabase} succeeds (e.g. refresh UI). */
@@ -11,13 +11,20 @@ let dbPromise: Promise<Database> | null = null;
 
 export async function getDb(): Promise<Database> {
   if (!dbPromise) {
-    dbPromise = Database.load(CFM_DB_URL).then(async (db) => {
+    dbPromise = (async () => {
+      await invoke<void>("cfm_reconcile_sqlite_files");
+      const db = await Database.load(CFM_DB_URL);
       const { runMigrations } = await import("./migration");
       await runMigrations(db);
       return db;
-    });
+    })();
   }
-  return dbPromise;
+  try {
+    return await dbPromise;
+  } catch (err) {
+    dbPromise = null;
+    throw err;
+  }
 }
 
 /** Load DB and apply pending frontend migrations; call once from app bootstrap. */

@@ -1,4 +1,20 @@
-AGENTS.md — Repo agent guidance
+# AGENTS.md — Repo agent guidance
+
+Concise reference for AI and human contributors. **Source of truth for registered Tauri commands** is `src-tauri/src/lib.rs` (`generate_handler!`); update the table below when that list changes.
+
+## Contents
+
+- [Project overview](#project-overview)
+- [Tech stack](#tech-stack)
+- [Code structure](#code-structure)
+- [Frontend ↔ Rust](#frontend--rust)
+- [Tauri commands](#tauri-commands-custom)
+- [Build / dev / app commands](#build--dev--app-commands)
+- [Tests and lint](#tests-and-lint)
+- [Code style](#code-style-agents-must-follow)
+- [UI components](#ui-components)
+- [State management](#state-management)
+- [Routing](#routing)
 
 ## Project overview
 
@@ -6,14 +22,16 @@ AGENTS.md — Repo agent guidance
 
 The UI is React 19 + TypeScript + Vite; persistence and CRUD use the **Tauri SQL plugin** on the frontend (`@tauri-apps/plugin-sql`). Custom Rust code lives under `src-tauri/src/` (commands, `CfmService`, process supervisor).
 
+**Bootstrap:** `initCfmDatabase()` runs from `src/app.tsx` on mount before other startup work (splash close, autostart behavior, window position).
+
 ## Tech stack
 
 - **Frontend**: React 19 + TypeScript + Vite 6
 - **UI**: shadcn/ui–style components (`src/components/ui/`), Tailwind CSS v4, Radix / `shadcn` package as applicable
 - **State**: Jotai (`src/stores/`)
-- **Routing**: React Router v7
+- **Routing**: React Router v7 (`src/app.tsx` defines routes; pages under `src/pages/`)
 - **Backend**: Tauri v2 + Rust
-- **Notable Tauri plugins** (see `src-tauri/src/lib.rs`): `tauri-plugin-sql`, `tauri-plugin-updater`, `tauri-plugin-autostart`, plus opener, shell, dialog, process, OS, notification, clipboard
+- **Notable Tauri plugins** (see `src-tauri/src/lib.rs`): `tauri-plugin-sql`, `tauri-plugin-updater`, `tauri-plugin-autostart`, `tauri-plugin-positioner`, plus opener, shell, dialog, process, OS, notification, clipboard
 
 ## Code structure
 
@@ -30,13 +48,14 @@ src/
 │   ├── database/        # SQLite schema + table modules (see below)
 │   ├── tauri-cfm.ts     # Typed invoke + DB helpers for CFM API
 │   └── ...
-├── app.tsx
+├── app.tsx              # Router, bootstrap (DB init, splash, autostart)
 └── main.tsx
 
 src-tauri/src/
 ├── commands/            # Tauri #[tauri::command] handlers
 │   ├── app_env.rs
 │   ├── cfm.rs           # Tunnel runtime: start/stop/restart, logs, cloudflared detection
+│   ├── database.rs      # SQLite file removal (reset DB)
 │   └── splash.rs
 ├── app/service.rs       # CfmService (orchestrates supervisor)
 ├── process/supervisor.rs
@@ -47,7 +66,7 @@ src-tauri/src/
 
 ### `src/lib/database/` layout
 
-- **`db.ts`** — connection, `getDb`, `initCfmDatabase` (single file; not per-table).
+- **`db.ts`** — connection, `getDb`, `initCfmDatabase`, `clearCfmDatabase`; `CFM_DB_URL` must match any `plugins.sql.preload` entry if you add preload back (currently empty so the DB opens on first `getDb`, after `cfm_reconcile_sqlite_files`).
 - **`migration.ts`** — all schema migrations in one place (single file).
 - **`index.ts`** — re-exports only.
 - **One `*.ts` file per table** for CRUD and table-specific types/constants (e.g. `access_entries.ts`, `app_settings.ts`). Do **not** add extra files here for one-off helpers, migration fragments, or non-table concerns—put those in `migration.ts`, colocate in the table file, or in `lib/` elsewhere.
@@ -56,6 +75,15 @@ src-tauri/src/
 
 - Prefer **`src/lib/tauri-cfm.ts`** (`cfmApi`) for invokes and re-exported DB types instead of scattering raw `invoke("…")` calls.
 - Runtime updates are broadcast as the Tauri event **`cfm://runtime-updated`** (see `cfmApi.onRuntimeUpdated`).
+- After a full DB reset, `clearCfmDatabase()` in `db.ts` dispatches **`cfm-database-cleared`** on `window` for UI refresh.
+
+### Typical change workflows
+
+| Task | Where to touch |
+|------|----------------|
+| New or changed DB column / table | `migration.ts` + the table’s `*.ts` + any TS types consumed by UI/`tauri-cfm.ts` |
+| New `#[tauri::command]` | `src-tauri/src/commands/*.rs`, register in `lib.rs`, then wrap in `cfmApi` or a typed helper if used from React |
+| New UI primitive | `pnpm dlx shadcn@latest add [name]` (see [UI components](#ui-components)) |
 
 ## Tauri commands (custom)
 
@@ -64,6 +92,8 @@ Registered in `src-tauri/src/lib.rs` via `generate_handler!`.
 | Command | Module | Purpose |
 |--------|--------|---------|
 | `app_is_login_autostart_launch` | `app_env` | `true` when launched with `--cfm-launch-at-login` |
+| `cfm_reconcile_sqlite_files` | `database` | If `cfm.sqlite3` is missing, removes orphan `-wal`/`-shm` so a cold start can create a fresh DB (called before `Database.load` in `getDb`) |
+| `cfm_delete_sqlite_database` | `database` | Deletes SQLite files in app config dir; callers must close the SQL pool first (see `clearCfmDatabase` in `db.ts`) |
 | `cfm_start_entry_with_input` | `cfm` | Start tunnel for an `AccessEntry`; optional `cloudflared_path` |
 | `cfm_stop_entry` | `cfm` | Stop by entry id (UUID string) |
 | `cfm_restart_entry_with_input` | `cfm` | Restart with updated entry / path |
@@ -81,7 +111,7 @@ Registered in `src-tauri/src/lib.rs` via `generate_handler!`.
 - Tauri build: `pnpm app-build`.
 - App icons: `pnpm icon` (uses `./app-icon.png`).
 - Bump version + changelog: `pnpm app-upver`.
-- Tauri updater signing keys: `pnpm app-sign`.
+- Tauri updater signing keys: `pnpm app-sign` (uses `rm`; requires a Unix-like shell—e.g. Git Bash on Windows).
 - Rename app scaffolding: `pnpm rename`.
 
 ## Tests and lint
@@ -114,12 +144,12 @@ Add new shadcn components with: `pnpm dlx shadcn@latest add [component-name]`
 
 ## Routing
 
-- React Router v7 for client-side routing; pages under `src/pages/`.
+- React Router v7 for client-side routing; routes are declared in `src/app.tsx`, pages under `src/pages/`.
 - Use data loading APIs where they fit the route.
 
 ## Tooling rules
 
-- No repo-local Cursor rules files were present when this section was written; if `.cursor/rules` or similar is added later, follow those in addition to this file.
+- No repo-local `.cursor/rules` were present when this section was written; if `.cursor/rules` or similar is added later, follow those in addition to this file.
 
 ## Scope
 

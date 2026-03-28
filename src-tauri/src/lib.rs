@@ -156,6 +156,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::app_env::app_is_login_autostart_launch,
+            commands::database::cfm_reconcile_sqlite_files,
             commands::database::cfm_delete_sqlite_database,
             commands::cfm::cfm_start_entry_with_input,
             commands::cfm::cfm_stop_entry,
