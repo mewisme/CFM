@@ -38,6 +38,7 @@ impl ExitCoordinator {
 pub fn run() {
     let cfm_state = commands::cfm::CfmAppState::default();
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_single_instance::init(|_app, _args, _cwd| {}))
         .manage(cfm_state.clone())
         .plugin(tauri_plugin_positioner::init())

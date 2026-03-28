@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { open, save } from "@tauri-apps/plugin-dialog";
+import { Download, Plus, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,13 @@ import {
 import { EntriesList } from "@/features/cfm/entries-list";
 import { EntryForm } from "@/features/cfm/entry-form";
 import { CFM_DATABASE_CLEARED_EVENT } from "@/lib/database";
+import {
+  buildExportJson,
+  parseEntriesImportJson,
+  readTextFile,
+  writeTextFile,
+} from "@/lib/entries-import-export";
+import { normalizeTarget, validateEntryForm } from "@/lib/entry-validation";
 import { cn } from "@/lib/utils";
 
 const defaultForm: AccessEntryInput = {
@@ -33,50 +41,6 @@ const defaultForm: AccessEntryInput = {
   enabled: true,
   show_process_terminal: false,
 };
-
-function validateEntryForm(form: AccessEntryInput): string[] {
-  const errors: string[] = [];
-
-  if (!form.name.trim()) {
-    errors.push("Name is required.");
-  }
-
-  const hostname = form.hostname.trim();
-  if (!hostname) {
-    errors.push("Hostname is required.");
-  } else if (!/^[a-zA-Z0-9.-]+$/.test(hostname)) {
-    errors.push("Hostname contains invalid characters.");
-  }
-
-  const target = form.target.trim();
-  if (!target) {
-    errors.push("Target is required.");
-  } else {
-    const onlyPort = /^\d{1,5}$/.test(target);
-    const hostAndPort =
-      /^([a-zA-Z0-9.-]+|\d{1,3}(?:\.\d{1,3}){3}):(\d{1,5})$/.test(target);
-    if (!onlyPort && !hostAndPort) {
-      errors.push("Target must be a port or host:port (example: 3000 or 127.0.0.1:3000).");
-    } else {
-      const targetParts = target.split(":");
-      const portSegment = targetParts[targetParts.length - 1];
-      const portValue = Number(onlyPort ? target : portSegment);
-      if (!Number.isInteger(portValue) || portValue < 1 || portValue > 65535) {
-        errors.push("Port must be between 1 and 65535.");
-      }
-    }
-  }
-
-  return errors;
-}
-
-function normalizeTarget(target: string): string {
-  const trimmed = target.trim();
-  if (/^\d{1,5}$/.test(trimmed)) {
-    return `127.0.0.1:${trimmed}`;
-  }
-  return trimmed;
-}
 
 export default function Home() {
   const { settings, refreshSettings } = useAppSettings();
@@ -163,6 +127,46 @@ export default function Home() {
     });
   }
 
+  async function exportEntriesList(): Promise<void> {
+    const path = await save({
+      title: "Export entries",
+      defaultPath: "cfm-entries.json",
+      filters: [{ name: "JSON", extensions: ["json"] }],
+    });
+    if (path === null) {
+      return;
+    }
+    await writeTextFile(path, buildExportJson(entries));
+    toast.success(
+      entries.length === 1 ? "Exported 1 entry" : `Exported ${entries.length} entries`,
+    );
+  }
+
+  async function importEntriesList(): Promise<void> {
+    const path = await open({
+      title: "Import entries",
+      multiple: false,
+      directory: false,
+      filters: [{ name: "JSON", extensions: ["json"] }, { name: "All files", extensions: ["*"] }],
+    });
+    if (path === null) {
+      return;
+    }
+    const raw = await readTextFile(path);
+    const inputs = parseEntriesImportJson(raw);
+    if (inputs.length === 0) {
+      toast.message("No entries in file");
+      return;
+    }
+    for (const input of inputs) {
+      await cfmApi.createEntry(input);
+    }
+    await refreshEntries();
+    toast.success(
+      inputs.length === 1 ? "Imported 1 entry" : `Imported ${inputs.length} entries`,
+    );
+  }
+
   async function submitEntry() {
     try {
       const normalizedForm: AccessEntryInput = {
@@ -232,10 +236,32 @@ export default function Home() {
                   Manage Cloudflare Access routes
                 </CardDescription>
               </div>
-              <Button type="button" size="sm" className="shrink-0 gap-1.5" onClick={openNewEntry}>
-                <Plus className="size-4" />
-                New entry
-              </Button>
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 gap-1.5"
+                  onClick={() => void importEntriesList().catch((error) => toast.error(String(error)))}
+                >
+                  <Upload className="size-4" />
+                  Import
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 gap-1.5"
+                  onClick={() => void exportEntriesList().catch((error) => toast.error(String(error)))}
+                >
+                  <Download className="size-4" />
+                  Export
+                </Button>
+                <Button type="button" size="sm" className="shrink-0 gap-1.5" onClick={openNewEntry}>
+                  <Plus className="size-4" />
+                  New entry
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 pb-4">

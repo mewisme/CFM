@@ -31,7 +31,7 @@ The UI is React 19 + TypeScript + Vite; persistence and CRUD use the **Tauri SQL
 - **State**: Jotai (`src/stores/`)
 - **Routing**: React Router v7 (`src/app.tsx` defines routes; pages under `src/pages/`)
 - **Backend**: Tauri v2 + Rust
-- **Notable Tauri plugins** (see `src-tauri/src/lib.rs`): `tauri-plugin-sql`, `tauri-plugin-updater`, `tauri-plugin-autostart`, `tauri-plugin-positioner`, plus opener, shell, dialog, process, OS, notification, clipboard
+- **Notable Tauri plugins** (see `src-tauri/src/lib.rs`): `tauri-plugin-sql`, `tauri-plugin-fs` (import/export entries JSON), `tauri-plugin-updater`, `tauri-plugin-autostart`, `tauri-plugin-positioner`, plus opener, shell, dialog, process, OS, notification, clipboard
 
 ## Code structure
 

@@ -12,6 +12,13 @@
     "autostart:default",
     "shell:default",
     "opener:default",
-    "positioner:default"
+    "positioner:default",
+    "fs:default",
+    "fs:allow-read-text-file",
+    "fs:allow-write-text-file",
+    {
+      "identifier": "fs:scope",
+      "allow": [{ "path": "**" }]
+    }
   ]
 }
