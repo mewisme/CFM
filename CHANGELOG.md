@@ -1,12 +1,9 @@
 ## What's Changed
 
-✨ Features
-
-- Implement import/export functionality for access entries ([c24d34d](../../commit/c24d34d))
-
 🔨 Other Changes
 
-- Bump version to 0.6.3 in package.json, tauri.conf.json, and Cargo files ([fb57195](../../commit/fb57195))
+- JSON import/export, duplicate handling, overwrite confirm ([83f63ba](../../commit/83f63ba))
+- Bump version to 0.7.0 in package.json, tauri.conf.json, and Cargo files ([f16e9c6](../../commit/f16e9c6))
 
 
-📋 Full Changelog: [fb57195...c24d34d](../../compare/fb57195...c24d34d)
+📋 Full Changelog: [f16e9c6...83f63ba](../../compare/f16e9c6...83f63ba)
