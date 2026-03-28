@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
-import { open, save } from "@tauri-apps/plugin-dialog";
+import { i18n } from "@lingui/core";
+import { plural, msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { Download, Plus, Upload, X } from "lucide-react";
+import { open, save } from "@tauri-apps/plugin-dialog";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -143,7 +146,7 @@ export default function Home() {
 
   async function exportEntriesList(): Promise<void> {
     const path = await save({
-      title: "Export entries",
+      title: i18n._(msg`Export entries`),
       defaultPath: "cfm-entries.json",
       filters: [{ name: "JSON", extensions: ["json"] }],
     });
@@ -152,7 +155,12 @@ export default function Home() {
     }
     await writeTextFile(path, buildExportJson(entries));
     toast.success(
-      entries.length === 1 ? "Exported 1 entry" : `Exported ${entries.length} entries`,
+      i18n._(
+        plural(entries.length, {
+          one: "Exported # entry",
+          other: "Exported # entries",
+        }),
+      ),
     );
   }
 
@@ -170,21 +178,32 @@ export default function Home() {
     const messages: string[] = [];
     if (plan.toCreate.length > 0) {
       messages.push(
-        plan.toCreate.length === 1 ? "Created 1 entry" : `Created ${plan.toCreate.length} entries`,
+        i18n._(
+          plural(plan.toCreate.length, {
+            one: "Created # entry",
+            other: "Created # entries",
+          }),
+        ),
       );
     }
     if (plan.toOverwrite.length > 0) {
       messages.push(
-        plan.toOverwrite.length === 1
-          ? "Updated 1 entry"
-          : `Updated ${plan.toOverwrite.length} entries`,
+        i18n._(
+          plural(plan.toOverwrite.length, {
+            one: "Updated # entry",
+            other: "Updated # entries",
+          }),
+        ),
       );
     }
     if (plan.skippedInFile > 0) {
       messages.push(
-        plan.skippedInFile === 1
-          ? "1 duplicate row skipped in file"
-          : `${plan.skippedInFile} duplicate rows skipped in file`,
+        i18n._(
+          plural(plan.skippedInFile, {
+            one: "# duplicate row skipped in file",
+            other: "# duplicate rows skipped in file",
+          }),
+        ),
       );
     }
     if (messages.length > 0) {
@@ -209,7 +228,7 @@ export default function Home() {
 
   async function importEntriesList(): Promise<void> {
     const path = await open({
-      title: "Import entries",
+      title: i18n._(msg`Import entries`),
       multiple: false,
       directory: false,
       filters: [{ name: "JSON", extensions: ["json"] }, { name: "All files", extensions: ["*"] }],
@@ -220,15 +239,17 @@ export default function Home() {
     const raw = await readTextFile(path);
     const inputs = parseEntriesImportJson(raw);
     if (inputs.length === 0) {
-      toast.message("No entries in file");
+      toast.message(i18n._(msg`No entries in file`));
       return;
     }
     const plan = buildImportPlan(inputs, entries);
     if (plan.toCreate.length === 0 && plan.toOverwrite.length === 0) {
       if (plan.skippedInFile > 0) {
-        toast.message(`Nothing to import. ${plan.skippedInFile} duplicate(s) in file.`);
+        toast.message(
+          i18n._(msg`Nothing to import. ${plan.skippedInFile} duplicate(s) in file.`),
+        );
       } else {
-        toast.message("Nothing to import.");
+        toast.message(i18n._(msg`Nothing to import.`));
       }
       return;
     }
@@ -259,10 +280,10 @@ export default function Home() {
 
       if (editingId) {
         await cfmApi.updateEntry(editingId, normalizedForm);
-        toast.success("Entry updated");
+        toast.success(i18n._(msg`Entry updated`));
       } else {
         await cfmApi.createEntry(normalizedForm);
-        toast.success("Entry created");
+        toast.success(i18n._(msg`Entry created`));
       }
       setForm((prev) => ({ ...prev, target: normalizedForm.target }));
       await refreshEntries();
@@ -279,7 +300,7 @@ export default function Home() {
         return;
       }
       if ((action === "start" || action === "restart") && !settings.cloudflared_path?.trim()) {
-        toast.error(INSTALL_CLOUDFLARED_MESSAGE);
+        toast.error(i18n._(INSTALL_CLOUDFLARED_MESSAGE));
         return;
       }
       if (action === "start") {
@@ -309,9 +330,11 @@ export default function Home() {
           <CardHeader className="shrink-0 space-y-1 pb-3">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0 space-y-1">
-                <CardTitle className="text-base sm:text-lg">Entries</CardTitle>
+                <CardTitle className="text-base sm:text-lg">
+                  <Trans>Entries</Trans>
+                </CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
-                  Manage Cloudflare Access routes
+                  <Trans>Manage Cloudflare Access routes</Trans>
                 </CardDescription>
               </div>
               <div className="flex flex-wrap items-center justify-end gap-2">
@@ -323,7 +346,7 @@ export default function Home() {
                   onClick={() => void importEntriesList().catch((error) => toast.error(String(error)))}
                 >
                   <Upload className="size-4" />
-                  Import
+                  <Trans>Import</Trans>
                 </Button>
                 <Button
                   type="button"
@@ -333,11 +356,11 @@ export default function Home() {
                   onClick={() => void exportEntriesList().catch((error) => toast.error(String(error)))}
                 >
                   <Download className="size-4" />
-                  Export
+                  <Trans>Export</Trans>
                 </Button>
                 <Button type="button" size="sm" className="shrink-0 gap-1.5" onClick={openNewEntry}>
                   <Plus className="size-4" />
-                  New entry
+                  <Trans>New entry</Trans>
                 </Button>
               </div>
             </div>
@@ -388,15 +411,15 @@ export default function Home() {
           <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:h-full">
             <CardHeader className="shrink-0 pb-3">
               <CardTitle className="text-base sm:text-lg">
-                {editingId ? "Edit entry" : "New entry"}
+                {editingId ? <Trans>Edit entry</Trans> : <Trans>New entry</Trans>}
               </CardTitle>
               <CardAction>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  title="Close"
-                  aria-label="Close form"
+                  title={i18n._(msg`Close`)}
+                  aria-label={i18n._(msg`Close form`)}
                   onClick={closeFormPanel}
                 >
                   <X className="size-4" />
@@ -409,7 +432,7 @@ export default function Home() {
                 isEditMode={Boolean(editingId)}
                 canEdit={!editingId || isEditMode}
                 onChange={setForm}
-                submitLabel={editingId ? "Save" : "Create"}
+                submitLabel={editingId ? i18n._(msg`Save`) : i18n._(msg`Create`)}
                 onEdit={() => setIsEditMode(true)}
                 onSubmit={() => void submitEntry()}
                 onReset={resetForm}
@@ -429,28 +452,44 @@ export default function Home() {
         }}
       >
         <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Overwrite existing entries?</AlertDialogTitle>
+            <AlertDialogHeader>
+            <AlertDialogTitle>
+              <Trans>Overwrite existing entries?</Trans>
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingImportPlan ? (
                 <>
-                  {pendingImportPlan.toOverwrite.length === 1
-                    ? "One route in the file uses the same hostname and target as an entry already in your list."
-                    : `${pendingImportPlan.toOverwrite.length} routes in the file use the same hostname and target as entries already in your list.`}{" "}
+                  {pendingImportPlan.toOverwrite.length === 1 ? (
+                    <Trans>
+                      One route in the file uses the same hostname and target as an entry already in
+                      your list.
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      {pendingImportPlan.toOverwrite.length} routes in the file use the same hostname
+                      and target as entries already in your list.
+                    </Trans>
+                  )}{" "}
                   {pendingImportPlan.toCreate.length > 0 ? (
                     <>
-                      {pendingImportPlan.toCreate.length === 1
-                        ? "One new route will be added."
-                        : `${pendingImportPlan.toCreate.length} new routes will be added.`}{" "}
+                      {pendingImportPlan.toCreate.length === 1 ? (
+                        <Trans>One new route will be added.</Trans>
+                      ) : (
+                        <Trans>
+                          {pendingImportPlan.toCreate.length} new routes will be added.
+                        </Trans>
+                      )}{" "}
                     </>
                   ) : null}
-                  Overwrite matching entries with the values from the file?
+                  <Trans>Overwrite matching entries with the values from the file?</Trans>
                 </>
               ) : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+            <AlertDialogCancel type="button">
+              <Trans>Cancel</Trans>
+            </AlertDialogCancel>
             <AlertDialogAction
               type="button"
               onClick={(event) => {
@@ -458,7 +497,7 @@ export default function Home() {
                 void confirmImportOverwrite();
               }}
             >
-              Overwrite
+              <Trans>Overwrite</Trans>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

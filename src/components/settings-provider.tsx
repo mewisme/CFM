@@ -1,3 +1,6 @@
+import { i18n } from "@lingui/core";
+import { defineMessage } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   createContext,
   useCallback,
@@ -17,19 +20,26 @@ import {
 } from "@/components/ui/dialog";
 import { SettingsForm } from "@/features/cfm/settings-form";
 import { clearCfmDatabase } from "@/lib/database";
+import { loadLocaleCatalog } from "@/lib/load-locale-catalog";
 import { cfmApi, type AppSettings } from "@/lib/tauri-cfm";
 import {
   applyLaunchAtLoginPreference,
   mergeSettingsWithOsAutostart,
 } from "@/lib/launch-at-login";
 
-export const INSTALL_CLOUDFLARED_MESSAGE =
-  "cloudflared is not detected. Install Cloudflare Tunnel and reopen the app, or set the binary path in Settings.";
+export const INSTALL_CLOUDFLARED_MESSAGE = defineMessage({
+  message:
+    "cloudflared is not detected. Install Cloudflare Tunnel and reopen the app, or set the binary path in Settings.",
+});
+
+const msgSettingsSaved = defineMessage({ message: "Settings saved" });
+const msgLocalDataCleared = defineMessage({ message: "Local data cleared" });
 
 const defaultSettings: AppSettings = {
   cloudflared_path: "",
   launch_at_login: false,
   autostart_minimized: false,
+  locale: "en",
 };
 
 type AppSettingsContextValue = {
@@ -57,14 +67,18 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const current = await cfmApi.getSettings();
     const hasConfiguredPath = Boolean(current.cloudflared_path?.trim());
     if (hasConfiguredPath) {
-      setSettings(await mergeSettingsWithOsAutostart(current));
+      const merged = await mergeSettingsWithOsAutostart(current);
+      setSettings(merged);
+      await loadLocaleCatalog(merged.locale);
       return;
     }
 
     const detectedPath = await cfmApi.detectCloudflaredPath();
     if (!detectedPath) {
-      setSettings(await mergeSettingsWithOsAutostart(current));
-      toast.error(INSTALL_CLOUDFLARED_MESSAGE);
+      const merged = await mergeSettingsWithOsAutostart(current);
+      setSettings(merged);
+      await loadLocaleCatalog(merged.locale);
+      toast.error(i18n._(INSTALL_CLOUDFLARED_MESSAGE));
       return;
     }
 
@@ -74,7 +88,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       cloudflared_path: normalizedPath,
     };
     await cfmApi.setSettings(next);
-    setSettings(await mergeSettingsWithOsAutostart(next));
+    const mergedNext = await mergeSettingsWithOsAutostart(next);
+    setSettings(mergedNext);
+    await loadLocaleCatalog(mergedNext.locale);
   }, []);
 
   const openSettingsDialog = useCallback(() => {
@@ -85,8 +101,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     try {
       await cfmApi.setSettings(settings);
       await applyLaunchAtLoginPreference(settings.launch_at_login);
-      setSettings(await mergeSettingsWithOsAutostart(settings));
-      toast.success("Settings saved");
+      const merged = await mergeSettingsWithOsAutostart(settings);
+      setSettings(merged);
+      await loadLocaleCatalog(merged.locale);
+      toast.success(i18n._(msgSettingsSaved));
       setDialogOpen(false);
     } catch (error) {
       console.error(error);
@@ -98,7 +116,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     try {
       await clearCfmDatabase();
       await refreshSettings();
-      toast.success("Local data cleared");
+      toast.success(i18n._(msgLocalDataCleared));
       setDialogOpen(false);
     } catch (error) {
       console.error(error);
@@ -125,9 +143,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           showCloseButton
         >
           <DialogHeader>
-            <DialogTitle>Settings</DialogTitle>
+            <DialogTitle>
+              <Trans>Settings</Trans>
+            </DialogTitle>
             <DialogDescription className="sr-only">
-              Application and cloudflared preferences
+              <Trans>Application and cloudflared preferences</Trans>
             </DialogDescription>
           </DialogHeader>
           <SettingsForm

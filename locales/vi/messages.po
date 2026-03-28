@@ -1,0 +1,236 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-03-28 16:37+0700\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+
+#. placeholder {0}: plan.skippedInFile
+#: src/pages/home.tsx:202
+msgid "{0, plural, one {# duplicate row skipped in file} other {# duplicate rows skipped in file}}"
+msgstr "{0, plural, one {# dòng trùng đã bỏ qua trong tệp} other {# dòng trùng đã bỏ qua trong tệp}}"
+
+#. placeholder {0}: plan.toCreate.length
+#: src/pages/home.tsx:182
+msgid "{0, plural, one {Created # entry} other {Created # entries}}"
+msgstr "{0, plural, one {Đã tạo # mục} other {Đã tạo # mục}}"
+
+#. placeholder {0}: entries.length
+#: src/pages/home.tsx:159
+msgid "{0, plural, one {Exported # entry} other {Exported # entries}}"
+msgstr "{0, plural, one {Đã xuất # mục} other {Đã xuất # mục}}"
+
+#. placeholder {0}: plan.toOverwrite.length
+#: src/pages/home.tsx:192
+msgid "{0, plural, one {Updated # entry} other {Updated # entries}}"
+msgstr "{0, plural, one {Đã cập nhật # mục} other {Đã cập nhật # mục}}"
+
+#. placeholder {0}: pendingImportPlan.toCreate.length
+#: src/pages/home.tsx:478
+msgid "{0} new routes will be added."
+msgstr "Sẽ thêm {0} tuyến mới."
+
+#. placeholder {0}: pendingImportPlan.toOverwrite.length
+#: src/pages/home.tsx:468
+msgid "{0} routes in the file use the same hostname and target as entries already in your list."
+msgstr "{0} tuyến trong tệp trùng hostname và đích với mục đã có trong danh sách của bạn."
+
+#: src/features/cfm/settings-form.tsx:148
+msgid "Appearance"
+msgstr "Giao diện"
+
+#: src/components/settings-provider.tsx:150
+msgid "Application and cloudflared preferences"
+msgstr "Tùy chọn ứng dụng và cloudflared"
+
+#: src/features/cfm/settings-form.tsx:234
+#: src/pages/home.tsx:491
+msgid "Cancel"
+msgstr "Hủy"
+
+#: src/features/cfm/settings-form.tsx:222
+msgid "Clear all local data?"
+msgstr "Xóa toàn bộ dữ liệu cục bộ?"
+
+#: src/features/cfm/settings-form.tsx:240
+msgid "Clear data"
+msgstr "Xóa dữ liệu"
+
+#: src/features/cfm/settings-form.tsx:216
+msgid "Clear local data"
+msgstr "Xóa dữ liệu cục bộ"
+
+#: src/features/cfm/settings-form.tsx:40
+msgid "Click to select cloudflared executable…"
+msgstr "Nhấn để chọn tệp thực thi cloudflared…"
+
+#: src/pages/home.tsx:421
+msgid "Close"
+msgstr "Đóng"
+
+#: src/pages/home.tsx:422
+msgid "Close form"
+msgstr "Đóng biểu mẫu"
+
+#: src/features/cfm/settings-form.tsx:93
+msgid "Cloudflared executable"
+msgstr "Tệp thực thi cloudflared"
+
+#: src/components/settings-provider.tsx:30
+msgid "cloudflared is not detected. Install Cloudflare Tunnel and reopen the app, or set the binary path in Settings."
+msgstr "Không phát hiện cloudflared. Hãy cài Cloudflare Tunnel và mở lại ứng dụng, hoặc đặt đường dẫn nhị phân trong Cài đặt."
+
+#: src/pages/home.tsx:435
+msgid "Create"
+msgstr "Tạo"
+
+#: src/features/cfm/settings-form.tsx:160
+msgid "Dark"
+msgstr "Tối"
+
+#: src/pages/home.tsx:414
+msgid "Edit entry"
+msgstr "Sửa mục"
+
+#: src/pages/home.tsx:334
+msgid "Entries"
+msgstr "Mục"
+
+#: src/pages/home.tsx:286
+msgid "Entry created"
+msgstr "Đã tạo mục"
+
+#: src/pages/home.tsx:283
+msgid "Entry updated"
+msgstr "Đã cập nhật mục"
+
+#: src/pages/home.tsx:359
+msgid "Export"
+msgstr "Xuất"
+
+#: src/pages/home.tsx:149
+msgid "Export entries"
+msgstr "Xuất các mục"
+
+#: src/pages/home.tsx:349
+msgid "Import"
+msgstr "Nhập"
+
+#: src/pages/home.tsx:231
+msgid "Import entries"
+msgstr "Nhập các mục"
+
+#: src/features/cfm/settings-form.tsx:177
+msgid "Language"
+msgstr "Ngôn ngữ"
+
+#: src/features/cfm/settings-form.tsx:128
+msgid "Launch at login"
+msgstr "Chạy khi đăng nhập"
+
+#: src/features/cfm/settings-form.tsx:157
+msgid "Light"
+msgstr "Sáng"
+
+#: src/features/cfm/settings-form.tsx:204
+msgid "Local data"
+msgstr "Dữ liệu cục bộ"
+
+#: src/components/settings-provider.tsx:36
+msgid "Local data cleared"
+msgstr "Đã xóa dữ liệu cục bộ"
+
+#: src/pages/home.tsx:337
+msgid "Manage Cloudflare Access routes"
+msgstr "Quản lý tuyến Cloudflare Access"
+
+#: src/pages/home.tsx:363
+#: src/pages/home.tsx:414
+msgid "New entry"
+msgstr "Mục mới"
+
+#: src/pages/home.tsx:242
+msgid "No entries in file"
+msgstr "Không có mục nào trong tệp"
+
+#: src/pages/home.tsx:252
+msgid "Nothing to import."
+msgstr "Không có gì để nhập."
+
+#. placeholder {0}: plan.skippedInFile
+#: src/pages/home.tsx:249
+msgid "Nothing to import. {0} duplicate(s) in file."
+msgstr "Không có gì để nhập. {0} bản trùng trong tệp."
+
+#: src/pages/home.tsx:476
+msgid "One new route will be added."
+msgstr "Một tuyến mới sẽ được thêm."
+
+#: src/pages/home.tsx:463
+msgid "One route in the file uses the same hostname and target as an entry already in your list."
+msgstr "Một tuyến trong tệp trùng hostname và đích với mục đã có trong danh sách của bạn."
+
+#: src/features/cfm/settings-form.tsx:112
+msgid "Opens the system file dialog. Windows: .exe; other OS: use \"All files\" if needed."
+msgstr "Mở hộp thoại tệp của hệ thống. Windows: .exe; hệ khác: dùng \"Tất cả tệp\" nếu cần."
+
+#: src/pages/home.tsx:500
+msgid "Overwrite"
+msgstr "Ghi đè"
+
+#: src/pages/home.tsx:457
+msgid "Overwrite existing entries?"
+msgstr "Ghi đè các mục hiện có?"
+
+#: src/pages/home.tsx:484
+msgid "Overwrite matching entries with the values from the file?"
+msgstr "Ghi đè các mục khớp bằng giá trị từ tệp?"
+
+#: src/features/cfm/settings-form.tsx:207
+msgid "Remove all saved entries and settings from this device and recreate an empty database. Restart the app if tunnels were running."
+msgstr "Xóa mọi mục và cài đặt đã lưu trên thiết bị này và tạo lại cơ sở dữ liệu trống. Khởi động lại ứng dụng nếu tunnel đang chạy."
+
+#: src/pages/home.tsx:435
+msgid "Save"
+msgstr "Lưu"
+
+#: src/features/cfm/settings-form.tsx:198
+msgid "Save settings"
+msgstr "Lưu cài đặt"
+
+#: src/features/cfm/settings-form.tsx:39
+msgid "Select cloudflared executable"
+msgstr "Chọn tệp thực thi cloudflared"
+
+#: src/components/footer.tsx:25
+#: src/components/settings-provider.tsx:147
+msgid "Settings"
+msgstr "Cài đặt"
+
+#: src/components/settings-provider.tsx:35
+msgid "Settings saved"
+msgstr "Đã lưu cài đặt"
+
+#: src/features/cfm/settings-form.tsx:141
+msgid "Start in tray when launched at login"
+msgstr "Khởi động ở khay khi chạy lúc đăng nhập"
+
+#: src/features/cfm/settings-form.tsx:163
+msgid "System"
+msgstr "Hệ thống"
+
+#: src/features/cfm/settings-form.tsx:43
+msgid "Theme"
+msgstr "Chủ đề"
+
+#: src/features/cfm/settings-form.tsx:225
+msgid "This deletes the tunnel entries and app settings stored in CFM's database on this device. This cannot be undone. If any tunnels are running, close them or restart the app afterward."
+msgstr "Thao tác này xóa các mục tunnel và cài đặt ứng dụng lưu trong cơ sở dữ liệu CFM trên thiết bị này. Không thể hoàn tác. Nếu tunnel đang chạy, hãy đóng hoặc khởi động lại ứng dụng sau đó."

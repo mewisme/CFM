@@ -7,7 +7,9 @@ Concise reference for AI and human contributors. **Source of truth for registere
 - [Project overview](#project-overview)
 - [Tech stack](#tech-stack)
 - [Code structure](#code-structure)
+- [Internationalization (Lingui)](#internationalization-lingui)
 - [Frontend ↔ Rust](#frontend--rust)
+- [Typical change workflows](#typical-change-workflows)
 - [Tauri commands](#tauri-commands-custom)
 - [Build / dev / app commands](#build--dev--app-commands)
 - [Tests and lint](#tests-and-lint)
@@ -22,22 +24,25 @@ Concise reference for AI and human contributors. **Source of truth for registere
 
 The UI is React 19 + TypeScript + Vite; persistence and CRUD use the **Tauri SQL plugin** on the frontend (`@tauri-apps/plugin-sql`). Custom Rust code lives under `src-tauri/src/` (commands, `CfmService`, process supervisor).
 
-**Bootstrap:** `initCfmDatabase()` runs from `src/app.tsx` on mount before other startup work (splash close, autostart behavior, window position).
+**Bootstrap:** `src/app.tsx` runs `initCfmDatabase()`, loads the message catalog with `loadLocaleCatalog()` from saved `app_settings.locale` (default **English**), then runs splash close / autostart window behavior. The main tree is wrapped in **`I18nProvider`**; the UI stays hidden until the catalog load finishes so the first paint matches the chosen language.
 
 ## Tech stack
 
 - **Frontend**: React 19 + TypeScript + Vite 6
+- **i18n**: Lingui (`@lingui/core`, `@lingui/react`, macros) with **`@lingui/vite-plugin`** and **`@lingui/babel-plugin-lingui-macro`** via `vite.config.ts` (`@vitejs/plugin-react` `babel.plugins`)
 - **UI**: shadcn/ui–style components (`src/components/ui/`), Tailwind CSS v4, Radix / `shadcn` package as applicable
 - **State**: Jotai (`src/stores/`)
 - **Routing**: React Router v7 (`src/app.tsx` defines routes; pages under `src/pages/`)
 - **Backend**: Tauri v2 + Rust
-- **Notable Tauri plugins** (see `src-tauri/src/lib.rs`): `tauri-plugin-sql`, `tauri-plugin-fs` (import/export entries JSON), `tauri-plugin-updater`, `tauri-plugin-autostart`, `tauri-plugin-positioner`, plus opener, shell, dialog, process, OS, notification, clipboard
+- **Notable Tauri plugins** (see `src-tauri/src/lib.rs`): `tauri-plugin-sql`, `tauri-plugin-fs` (catalog JSON + import/export entries JSON), `tauri-plugin-updater`, `tauri-plugin-autostart`, `tauri-plugin-positioner`, plus opener, shell, dialog, process, OS, notification, clipboard
 
 ## Code structure
 
 ```
 scripts/                 # Version bump, changelog, rename
 public/                  # Static web assets (e.g. splash)
+locales/                 # i18n: {locale}/messages.po (source), messages.json (compiled, shipped)
+lingui.config.ts         # Lingui: locales, catalogs, compileNamespace json, PO formatter
 src/
 ├── components/          # Shared layout, theme, error boundary; ui/ = shadcn-style primitives
 ├── features/            # Feature areas (e.g. features/cfm/, features/titlebar/, features/updater/)
@@ -47,8 +52,10 @@ src/
 ├── lib/
 │   ├── database/        # SQLite schema + table modules (see below)
 │   ├── tauri-cfm.ts     # Typed invoke + DB helpers for CFM API
+│   ├── app-locale.ts    # DEFAULT_LOCALE, SUPPORTED_LOCALES, normalizeAppLocale
+│   ├── load-locale-catalog.ts  # resourceDir + readTextFile → i18n.loadAndActivate
 │   └── ...
-├── app.tsx              # Router, bootstrap (DB init, splash, autostart)
+├── app.tsx              # Router, DB + i18n bootstrap, splash, autostart
 └── main.tsx
 
 src-tauri/src/
@@ -69,20 +76,31 @@ src-tauri/src/
 - **`db.ts`** — connection, `getDb`, `initCfmDatabase`, `clearCfmDatabase`; `CFM_DB_URL` must match any `plugins.sql.preload` entry if you add preload back (currently empty so the DB opens on first `getDb`, after `cfm_reconcile_sqlite_files`).
 - **`migration.ts`** — all schema migrations in one place (single file).
 - **`index.ts`** — re-exports only.
-- **One `*.ts` file per table** for CRUD and table-specific types/constants (e.g. `access_entries.ts`, `app_settings.ts`). Do **not** add extra files here for one-off helpers, migration fragments, or non-table concerns—put those in `migration.ts`, colocate in the table file, or in `lib/` elsewhere.
+- **One `*.ts` file per table** for CRUD and table-specific types/constants (e.g. `access_entries.ts`, `app_settings.ts`). **`app_settings.ts`** includes **`locale`** (key `locale` in SQLite), among `cloudflared_path`, `launch_at_login`, `autostart_minimized`. Do **not** add extra files here for one-off helpers, migration fragments, or non-table concerns—put those in `migration.ts`, colocate in the table file, or in `lib/` elsewhere.
 
-### Frontend ↔ Rust
+## Internationalization (Lingui)
+
+- **Config:** `lingui.config.ts` — `sourceLocale: "en"`, locales listed explicitly (e.g. `en`, `vi`), catalogs at `<rootDir>/locales/{locale}/messages`, **`compileNamespace: "json"`** so `lingui compile` writes **`messages.json`** (not only PO).
+- **Runtime catalogs:** the app loads **`locales/<locale>/messages.json`** from the Tauri **resource** directory (`resourceDir()` + `join`, then `readTextFile` from `@tauri-apps/plugin-fs`). **`src-tauri/tauri.conf.json`** → `bundle.resources` includes **`../locales`** so packaged builds ship those files.
+- **Persistence:** `getAppSettings` / `setAppSettings` read and write `locale`; invalid or missing values normalize via **`normalizeAppLocale`** in `src/lib/app-locale.ts` (default **`en`**). Changing language in Settings applies after **Save** (see `loadLocaleCatalog` in `settings-provider.tsx`).
+- **Authoring strings:** prefer `<Trans>` and **`defineMessage`** from `@lingui/core/macro` for strings that must land in catalogs; use **`plural`** / **`msg`** from `@lingui/core/macro` where appropriate; **`i18n._(descriptor)`** for toasts and dialog titles. Macros must compile through the Babel Lingui plugin (see `vite.config.ts`); avoid patterns that skip extraction (e.g. only dynamic macro calls the extractor cannot see).
+- **Workflow:** after changing user-visible copy, run **`pnpm i18n:extract`**, update translations in **`locales/<locale>/messages.po`**, then **`pnpm i18n:compile`** (or rely on **`pnpm build`**, which runs `lingui compile` before Vite).
+
+## Frontend ↔ Rust
 
 - Prefer **`src/lib/tauri-cfm.ts`** (`cfmApi`) for invokes and re-exported DB types instead of scattering raw `invoke("…")` calls.
 - Runtime updates are broadcast as the Tauri event **`cfm://runtime-updated`** (see `cfmApi.onRuntimeUpdated`).
 - After a full DB reset, `clearCfmDatabase()` in `db.ts` dispatches **`cfm-database-cleared`** on `window` for UI refresh.
 
-### Typical change workflows
+## Typical change workflows
 
 | Task | Where to touch |
 |------|----------------|
 | New or changed DB column / table | `migration.ts` + the table’s `*.ts` + any TS types consumed by UI/`tauri-cfm.ts` |
+| New or changed **app setting** (key-value in `app_settings`) | `app_settings.ts` (`APP_SETTING_KEYS`, `AppSettings`, `get`/`set`) + UI that edits it (e.g. `settings-form.tsx`) |
+| New user-visible string / locale | Markup or `defineMessage` in TSX/TS, then `pnpm i18n:extract` → PO → translate → `pnpm i18n:compile`; commit **`locales/`** PO + generated **`messages.json`** so Tauri resources stay in sync |
 | New `#[tauri::command]` | `src-tauri/src/commands/*.rs`, register in `lib.rs`, then wrap in `cfmApi` or a typed helper if used from React |
+| New bundled non-code asset next to the binary | `tauri.conf.json` `bundle.resources`; resolve at runtime with `resourceDir` (and plugin-fs permissions if reading) |
 | New UI primitive | `pnpm dlx shadcn@latest add [name]` (see [UI components](#ui-components)) |
 
 ## Tauri commands (custom)
@@ -104,8 +122,9 @@ Registered in `src-tauri/src/lib.rs` via `generate_handler!`.
 
 ## Build / dev / app commands
 
-- Run dev UI: `pnpm dev` (Vite only).
-- Build web: `pnpm build` (`tsc && vite build`).
+- Run dev UI: `pnpm dev` (Vite only; macros require Babel path above—use **`pnpm app-dev`** for full Tauri + Lingui behavior).
+- Build web: `pnpm build` (`tsc && lingui compile && vite build`).
+- Extract / compile catalogs only: **`pnpm i18n:extract`**, **`pnpm i18n:compile`**.
 - Preview build: `pnpm preview`.
 - Tauri dev: `pnpm app-dev`.
 - Tauri build: `pnpm app-build`.

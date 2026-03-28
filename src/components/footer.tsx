@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { ExternalLink, Github, Settings } from "lucide-react";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
@@ -20,7 +21,9 @@ export function Footer() {
         className="flex items-center gap-1.5 transition-colors hover:text-foreground"
       >
         <Settings size={14} aria-hidden />
-        <span>Settings</span>
+        <span>
+          <Trans>Settings</Trans>
+        </span>
       </button>
       <span className="text-muted-foreground/50">•</span>
       <VersionDisplay />
