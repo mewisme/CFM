@@ -1,7 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import {
+  isPermissionGranted,
+  requestPermission,
+  sendNotification,
+} from "@tauri-apps/plugin-notification";
 import { check, type DownloadEvent } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { getVersion } from "@tauri-apps/api/app";
@@ -23,6 +28,24 @@ export interface UpdateInfo {
   error?: string;
 }
 
+async function notifyNewVersionAvailable(newVersion: string): Promise<void> {
+  try {
+    let permissionGranted = await isPermissionGranted();
+    if (!permissionGranted) {
+      const permission = await requestPermission();
+      permissionGranted = permission === "granted";
+    }
+    if (permissionGranted) {
+      sendNotification({
+        title: "CFM update available",
+        body: `Version ${newVersion} is ready. Open the app and click the version in the footer to install.`,
+      });
+    }
+  } catch (error) {
+    console.error("Failed to send update notification:", error);
+  }
+}
+
 export function VersionDisplay({ className }: { className?: string }) {
   const [version, setVersion] = useState("");
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo>({
@@ -32,6 +55,7 @@ export function VersionDisplay({ className }: { className?: string }) {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [updateProgress, setUpdateProgress] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
+  const notifiedUpdateVersionRef = useRef<string | null>(null);
 
   const checkForUpdates = async () => {
     try {
@@ -44,6 +68,13 @@ export function VersionDisplay({ className }: { className?: string }) {
           currentVersion: version,
           newVersion: update.version,
         });
+        if (
+          update.version &&
+          notifiedUpdateVersionRef.current !== update.version
+        ) {
+          notifiedUpdateVersionRef.current = update.version;
+          void notifyNewVersionAvailable(update.version);
+        }
       } else {
         setUpdateInfo({
           status: UpdateStatus.LATEST,

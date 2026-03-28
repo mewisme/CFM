@@ -17,8 +17,8 @@
         "title": "Cloudflared Access Manager",
         "width": 800,
         "height": 700,
-        "minWidth": 720,
-        "minHeight": 560,
+        "minWidth": 800,
+        "minHeight": 700,
         "devtools": true,
         "decorations": false,
         "transparent": true,
@@ -34,6 +34,17 @@
         "decorations": false,
         "resizable": false,
         "center": true
+      },
+      {
+        "label": "single-instance-notice",
+        "url": "single-instance.html",
+        "width": 300,
+        "height": 400,
+        "decorations": true,
+        "resizable": false,
+        "center": true,
+        "visible": false,
+        "alwaysOnTop": true
       }
     ],
     "security": {

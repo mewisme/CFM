@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { getAppSettings, initCfmDatabase } from '@/lib/database';
-
+import { moveWindow, Position } from '@tauri-apps/plugin-positioner'
 
 function App() {
   async function bootstrap() {
@@ -22,6 +22,7 @@ function App() {
     if (isLoginAutostart && appSettings.autostart_minimized) {
       await getCurrentWindow().hide();
     }
+    await moveWindow(Position.Center);
   }
 
   useEffect(() => {

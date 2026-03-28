@@ -41,9 +41,7 @@ impl ExitCoordinator {
 /// primary instance. See <https://v2.tauri.app/plugin/single-instance/> ("Focusing on New Instance").
 #[cfg(desktop)]
 fn on_secondary_instance_attempt(app: &AppHandle) {
-    let main = app
-        .get_webview_window("main")
-        .expect("no main window");
+    let main = app.get_webview_window("main").expect("no main window");
     let _ = main.show();
     let _ = main.set_focus();
 
@@ -68,7 +66,7 @@ fn on_secondary_instance_attempt(app: &AppHandle) {
 }
 
 pub fn run() {
-    let mut builder = tauri::Builder::default();
+    let mut builder = tauri::Builder::default().plugin(tauri_plugin_positioner::init());
 
     // Single Instance must be registered first — see
     // <https://v2.tauri.app/plugin/single-instance/#setup>

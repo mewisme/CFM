@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,11 +76,6 @@ export default function Home() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(true);
 
-  const selectedEntry = useMemo(
-    () => entries.find((item) => item.id === selectedId) ?? null,
-    [entries, selectedId]
-  );
-
   function applyRuntimeResult(result: RuntimeEntry): void {
     setRuntime((prev) => ({ ...prev, [result.id]: result }));
   }
@@ -88,9 +83,6 @@ export default function Home() {
   async function refreshEntries() {
     const data = await cfmApi.listEntries();
     setEntries(data);
-    if (!selectedId && data.length > 0) {
-      setSelectedId(data[0].id);
-    }
   }
 
   async function refreshRuntime() {
@@ -230,17 +222,12 @@ export default function Home() {
         </Card>
 
         <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:h-full">
-          <CardHeader className="shrink-0 space-y-1 pb-2">
+          <CardHeader className="shrink-0 space-y-1">
             <CardTitle className="text-base sm:text-lg">
               {editingId ? "Edit entry" : "New entry"}
             </CardTitle>
-            {selectedEntry ? (
-              <CardDescription className="truncate text-xs sm:text-sm">
-                {selectedEntry.name}
-              </CardDescription>
-            ) : null}
           </CardHeader>
-          <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 pb-4">
+          <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6">
             <EntryForm
               title={editingId ? "View / edit" : "Create"}
               value={form}

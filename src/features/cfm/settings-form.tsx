@@ -123,7 +123,7 @@ export function SettingsForm(props: {
             <SelectTrigger className="h-9 w-full max-w-full min-w-0">
               <SelectValue placeholder="Theme" />
             </SelectTrigger>
-            <SelectContent position="popper">
+            <SelectContent position="popper" className="z-50">
               <SelectItem value="light">Light</SelectItem>
               <SelectItem value="dark">Dark</SelectItem>
               <SelectItem value="system">System</SelectItem>
