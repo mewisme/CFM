@@ -1,12 +1,12 @@
 ## What's Changed
 
-♻️ Refactoring
+✨ Features
 
-- Simplify EntryForm component and enhance Home page layout ([723bcc6](../../commit/723bcc6))
+- Add local data clearing functionality in settings ([7d7a660](../../commit/7d7a660))
 
 🔨 Other Changes
 
-- Bump version to 0.4.6 in package.json, tauri.conf.json, and Cargo files ([873d505](../../commit/873d505))
+- Bump version to 0.4.7 in package.json, tauri.conf.json, and Cargo files ([50121ac](../../commit/50121ac))
 
 
-📋 Full Changelog: [873d505...723bcc6](../../compare/873d505...723bcc6)
+📋 Full Changelog: [50121ac...7d7a660](../../compare/50121ac...7d7a660)
