@@ -50,8 +50,8 @@ export function WindowsButtons() {
       </button>
       <button
         onClick={handleClose}
-        title="Close"
-        aria-label="Close window"
+        title="Hide to tray"
+        aria-label="Hide window to system tray"
         className={`cursor-pointer w-[46px] h-full flex items-center justify-center text-foreground hover:bg-[#e81123] hover:text-white active:bg-[#c50f1f] transition-colors ${!isFocused ? 'opacity-50' : ''
           }`}
       >

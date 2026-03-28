@@ -32,8 +32,8 @@ export function MacOSButtons() {
     <div className="flex items-center gap-2 group">
       <button
         onClick={handleClose}
-        title="Close"
-        aria-label="Close window"
+        title="Hide to tray"
+        aria-label="Hide window to system tray"
         className={`cursor-pointer w-3 h-3 rounded-full border-[0.5px] border-black/[0.04] flex items-center justify-center relative hover:brightness-95 transition-colors ${isFocused ? 'bg-[#ff5f57]' : 'bg-primary/30'
           }`}
       >

@@ -5,7 +5,7 @@ description = "cfm"
 authors = ["mewisme"]
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+# Windows-only: dependencies are only linked when building for Windows.
 
 [lib]
 # The `_lib` suffix may seem redundant but it is necessary
@@ -14,12 +14,11 @@ edition = "2021"
 name = "tauri_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
-[build-dependencies]
+[target.'cfg(target_os = "windows")'.build-dependencies]
 tauri-build = { version = "2", features = [] }
 
-[dependencies]
+[target.'cfg(target_os = "windows")'.dependencies]
 tauri = { version = "2", features = [
-  "macos-private-api",
   "devtools",
   "image-png",
   "tray-icon",
@@ -38,7 +37,6 @@ thiserror = "2"
 uuid = { version = "1", features = ["v4", "serde"] }
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 tauri-plugin-opener = "2"
-
-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
+tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"

@@ -2,16 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { INSTALL_CLOUDFLARED_MESSAGE, useAppSettings } from "@/components/settings-provider";
 import {
   cfmApi,
   type AccessEntry,
   type AccessEntryInput,
-  type AppSettings,
   type RuntimeEntry,
 } from "@/lib/tauri-cfm";
 import { EntriesList } from "@/features/cfm/entries-list";
 import { EntryForm } from "@/features/cfm/entry-form";
-import { SettingsForm } from "@/features/cfm/settings-form";
 
 const defaultForm: AccessEntryInput = {
   name: "",
@@ -21,15 +20,8 @@ const defaultForm: AccessEntryInput = {
   autostart: false,
   restart_policy: "on_failure",
   enabled: true,
-  tray_pinned: false,
+  show_process_terminal: false,
 };
-
-const defaultSettings: AppSettings = {
-  cloudflared_path: "",
-  autostart_minimized: false,
-};
-const installCloudflaredMessage =
-  "cloudflared is not detected. Install Cloudflare Tunnel and reopen the app, or set the binary path in Settings.";
 
 function validateEntryForm(form: AccessEntryInput): string[] {
   const errors: string[] = [];
@@ -76,19 +68,22 @@ function normalizeTarget(target: string): string {
 }
 
 export default function Home() {
+  const { settings, refreshSettings } = useAppSettings();
   const [entries, setEntries] = useState<AccessEntry[]>([]);
   const [runtime, setRuntime] = useState<Record<string, RuntimeEntry>>({});
   const [selectedId, setSelectedId] = useState<string>("");
-  const [logs, setLogs] = useState<string[]>([]);
   const [form, setForm] = useState<AccessEntryInput>(defaultForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(true);
-  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
 
   const selectedEntry = useMemo(
     () => entries.find((item) => item.id === selectedId) ?? null,
     [entries, selectedId]
   );
+
+  function applyRuntimeResult(result: RuntimeEntry): void {
+    setRuntime((prev) => ({ ...prev, [result.id]: result }));
+  }
 
   async function refreshEntries() {
     const data = await cfmApi.listEntries();
@@ -102,30 +97,6 @@ export default function Home() {
     const snapshot = await cfmApi.runtimeSnapshot();
     const mapped = Object.fromEntries(snapshot.map((item) => [item.id, item]));
     setRuntime(mapped);
-  }
-
-  async function refreshSettings() {
-    const current = await cfmApi.getSettings();
-    const hasConfiguredPath = Boolean(current.cloudflared_path?.trim());
-    if (hasConfiguredPath) {
-      setSettings(current);
-      return;
-    }
-
-    const detectedPath = await cfmApi.detectCloudflaredPath();
-    if (!detectedPath) {
-      setSettings(current);
-      toast.error(installCloudflaredMessage);
-      return;
-    }
-
-    const normalizedPath = detectedPath.trim();
-    const next: AppSettings = {
-      ...current,
-      cloudflared_path: normalizedPath,
-    };
-    await cfmApi.setSettings(next);
-    setSettings(next);
   }
 
   useEffect(() => {
@@ -144,17 +115,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!selectedId) {
-      setLogs([]);
-      return;
-    }
-    cfmApi
-      .entryLogs(selectedId)
-      .then(setLogs)
-      .catch((error) => toast.error(String(error)));
-  }, [selectedId]);
-
   function resetForm() {
     setForm(defaultForm);
     setEditingId(null);
@@ -172,7 +132,7 @@ export default function Home() {
       autostart: entry.autostart,
       restart_policy: entry.restart_policy,
       enabled: entry.enabled,
-      tray_pinned: entry.tray_pinned,
+      show_process_terminal: entry.show_process_terminal,
     });
   }
 
@@ -210,13 +170,17 @@ export default function Home() {
         return;
       }
       if ((action === "start" || action === "restart") && !settings.cloudflared_path?.trim()) {
-        toast.error(installCloudflaredMessage);
+        toast.error(INSTALL_CLOUDFLARED_MESSAGE);
         return;
       }
-      if (action === "start") await cfmApi.startEntry(entry, settings.cloudflared_path ?? null);
-      if (action === "stop") await cfmApi.stopEntry(id);
+      if (action === "start") {
+        applyRuntimeResult(await cfmApi.startEntry(entry, settings.cloudflared_path ?? null));
+      }
+      if (action === "stop") {
+        applyRuntimeResult(await cfmApi.stopEntry(id));
+      }
       if (action === "restart") {
-        await cfmApi.restartEntry(entry, settings.cloudflared_path ?? null);
+        applyRuntimeResult(await cfmApi.restartEntry(entry, settings.cloudflared_path ?? null));
       }
       await refreshRuntime();
     } catch (error) {
@@ -225,14 +189,16 @@ export default function Home() {
   }
 
   return (
-    <main className="w-full p-4">
-      <div className="grid h-[calc(100vh-100px)] grid-cols-1 gap-4 lg:grid-cols-[minmax(420px,1.2fr)_minmax(420px,1fr)] 2xl:grid-cols-[minmax(520px,1.4fr)_minmax(520px,1fr)]">
-        <Card className="flex min-h-0 flex-col">
-          <CardHeader>
-            <CardTitle>Entries</CardTitle>
-            <CardDescription>Manage Cloudflare Access routes</CardDescription>
+    <div className="mx-auto flex min-h-0 w-full max-w-[1920px] flex-1 flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 md:grid-rows-1 md:gap-4 lg:gap-5">
+        <Card className="flex min-h-0 min-w-0 flex-col md:h-full">
+          <CardHeader className="shrink-0 space-y-1 pb-3">
+            <CardTitle className="text-base sm:text-lg">Entries</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
+              Manage Cloudflare Access routes
+            </CardDescription>
           </CardHeader>
-          <CardContent className="min-h-0 overflow-auto">
+          <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 pb-4">
             <EntriesList
               entries={entries}
               runtime={runtime}
@@ -263,57 +229,32 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <div className="min-h-0 space-y-4 overflow-auto pr-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>{editingId ? "Edit Entry" : "New Entry"}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <EntryForm
-                title={editingId ? "View / Edit" : "Create"}
-                value={form}
-                isEditMode={Boolean(editingId)}
-                canEdit={!editingId || isEditMode}
-                onChange={setForm}
-                submitLabel={editingId ? "Save" : "Create"}
-                onEdit={() => setIsEditMode(true)}
-                onSubmit={() => void submitEntry()}
-                onReset={resetForm}
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Runtime / Logs</CardTitle>
-              <CardDescription>{selectedEntry?.name ?? "Select an entry"}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="h-[260px] w-full overflow-auto rounded-md bg-muted p-3 text-xs lg:h-[320px]">
-                {logs.length > 0 ? logs.join("\n") : "No logs yet"}
-              </pre>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SettingsForm
-                value={settings}
-                onChange={setSettings}
-                onSave={() =>
-                  void (async () => {
-                    await cfmApi.setSettings(settings);
-                    toast.success("Settings saved");
-                  })()
-                }
-              />
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:h-full">
+          <CardHeader className="shrink-0 space-y-1 pb-2">
+            <CardTitle className="text-base sm:text-lg">
+              {editingId ? "Edit entry" : "New entry"}
+            </CardTitle>
+            {selectedEntry ? (
+              <CardDescription className="truncate text-xs sm:text-sm">
+                {selectedEntry.name}
+              </CardDescription>
+            ) : null}
+          </CardHeader>
+          <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 pb-4">
+            <EntryForm
+              title={editingId ? "View / edit" : "Create"}
+              value={form}
+              isEditMode={Boolean(editingId)}
+              canEdit={!editingId || isEditMode}
+              onChange={setForm}
+              submitLabel={editingId ? "Save" : "Create"}
+              onEdit={() => setIsEditMode(true)}
+              onSubmit={() => void submitEntry()}
+              onReset={resetForm}
+            />
+          </CardContent>
+        </Card>
       </div>
-    </main>
+    </div>
   );
 }

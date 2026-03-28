@@ -38,7 +38,8 @@ pub struct AccessEntry {
     pub autostart: bool,
     pub restart_policy: RestartPolicy,
     pub enabled: bool,
-    pub tray_pinned: bool,
+    #[serde(default)]
+    pub show_process_terminal: bool,
     pub notes: Option<String>,
     pub created_at: String,
     pub updated_at: String,

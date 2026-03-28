@@ -1,3 +1,5 @@
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,9 +10,42 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 import type { AccessEntryInput } from "./types";
 import type { AccessType, RestartPolicy } from "@/lib/tauri-cfm";
+
+function EntrySwitchRow(props: {
+  title: string;
+  description?: string;
+  checked: boolean;
+  disabled: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  className?: string;
+}) {
+  const { title, description, checked, disabled, onCheckedChange, className } = props;
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-2.5 px-3 py-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:py-3",
+        className
+      )}
+    >
+      <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+        <p className="text-sm font-medium leading-tight">{title}</p>
+        {description ? (
+          <p className="text-xs leading-snug text-muted-foreground">{description}</p>
+        ) : null}
+      </div>
+      <Switch
+        className="mt-0.5 shrink-0 self-start"
+        checked={checked}
+        disabled={disabled}
+        onCheckedChange={onCheckedChange}
+      />
+    </div>
+  );
+}
 
 export function EntryForm(props: {
   title: string;
@@ -23,7 +58,8 @@ export function EntryForm(props: {
   onReset: () => void;
   submitLabel: string;
 }) {
-  const { title, value, isEditMode, canEdit, onChange, onEdit, onSubmit, onReset, submitLabel } = props;
+  const { title, value, isEditMode, canEdit, onChange, onEdit, onSubmit, onReset, submitLabel } =
+    props;
 
   return (
     <div className="space-y-3">
@@ -78,34 +114,43 @@ export function EntryForm(props: {
         disabled={!canEdit}
         onChange={(e) => onChange({ ...value, target: e.target.value })}
       />
-      <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-3">
-        <label className="flex items-center gap-2">
-          <Switch
-            checked={value.enabled}
-            disabled={!canEdit}
-            onCheckedChange={(checked) => onChange({ ...value, enabled: Boolean(checked) })}
-          />
-          Enabled
-        </label>
-        <label className="flex items-center gap-2">
-          <Switch
-            checked={value.autostart}
-            disabled={!canEdit}
-            onCheckedChange={(checked) => onChange({ ...value, autostart: Boolean(checked) })}
-          />
-          Autostart
-        </label>
-        <label className="flex items-center gap-2">
-          <Switch
-            checked={value.tray_pinned}
-            disabled={!canEdit}
-            onCheckedChange={(checked) =>
-              onChange({ ...value, tray_pinned: Boolean(checked) })
-            }
-          />
-          Tray pinned
-        </label>
+
+      <div className="space-y-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Route options
+        </p>
+        <div className="overflow-hidden rounded-xl border border-border/80 bg-muted/20 shadow-sm dark:bg-muted/10">
+          <div className="divide-y divide-border/70">
+            <EntrySwitchRow
+              title="Enabled"
+              description="When off, this route is skipped and won’t start with the app."
+              checked={value.enabled}
+              disabled={!canEdit}
+              onCheckedChange={(checked) => onChange({ ...value, enabled: Boolean(checked) })}
+            />
+            <EntrySwitchRow
+              title="Autostart"
+              description="Start this tunnel automatically when CFM launches."
+              checked={value.autostart}
+              disabled={!canEdit}
+              onCheckedChange={(checked) => onChange({ ...value, autostart: Boolean(checked) })}
+            />
+            <EntrySwitchRow
+              title="Show cloudflared console"
+              description="Opens a separate terminal window for this process (Windows). Changing this requires stopping and starting the tunnel again."
+              checked={value.show_process_terminal}
+              disabled={!canEdit}
+              onCheckedChange={(checked) => {
+                onChange({ ...value, show_process_terminal: Boolean(checked) });
+                toast.info(
+                  "Stop the tunnel, then Start again for the console window setting to take effect.",
+                );
+              }}
+            />
+          </div>
+        </div>
       </div>
+
       <div className="flex flex-wrap gap-2">
         {isEditMode && !canEdit && (
           <Button variant="secondary" onClick={onEdit}>
@@ -124,4 +169,3 @@ export function EntryForm(props: {
     </div>
   );
 }
-
