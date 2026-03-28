@@ -17,8 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - platform: 'windows-latest'
-          - platform: 'self-hosted'
+          - platform: 'windows-latest'
             args: ''
 
     runs-on: ${{ matrix.platform }}
