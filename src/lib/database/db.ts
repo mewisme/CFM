@@ -1,6 +1,8 @@
 import Database from "@tauri-apps/plugin-sql";
 import { invoke } from "@tauri-apps/api/core";
 
+import { runMigrations } from "./migration";
+
 /** Relative to app config dir; must match any `plugins.sql.preload` entry in tauri.conf.json. */
 export const CFM_DB_URL = "sqlite:cfm.sqlite3" as const;
 
@@ -14,7 +16,6 @@ export async function getDb(): Promise<Database> {
     dbPromise = (async () => {
       await invoke<void>("cfm_reconcile_sqlite_files");
       const db = await Database.load(CFM_DB_URL);
-      const { runMigrations } = await import("./migration");
       await runMigrations(db);
       return db;
     })();
