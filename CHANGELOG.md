@@ -2,8 +2,8 @@
 
 🔨 Other Changes
 
-- Import runMigrations directly in getDb function ([b42512a](../../commit/b42512a))
-- Bump version to 0.6.0 in package.json, tauri.conf.json, and Cargo files ([a260938](../../commit/a260938))
+- Keep main hidden when starting in tray at login ([c7e408c](../../commit/c7e408c))
+- Bump version to 0.6.1 in package.json, tauri.conf.json, and Cargo files ([aacb23f](../../commit/aacb23f))
 
 
-📋 Full Changelog: [a260938...b42512a](../../compare/a260938...b42512a)
+📋 Full Changelog: [aacb23f...c7e408c](../../compare/aacb23f...c7e408c)
