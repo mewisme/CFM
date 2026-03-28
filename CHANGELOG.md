@@ -1,9 +1,12 @@
 ## What's Changed
 
+✨ Features
+
+- Implement import/export functionality for access entries ([c24d34d](../../commit/c24d34d))
+
 🔨 Other Changes
 
-- Update splash_close command to use Option for show_main ([4efb06d](../../commit/4efb06d))
-- Bump version to 0.6.2 in package.json, tauri.conf.json, and Cargo files ([ddd5ddd](../../commit/ddd5ddd))
+- Bump version to 0.6.3 in package.json, tauri.conf.json, and Cargo files ([fb57195](../../commit/fb57195))
 
 
-📋 Full Changelog: [ddd5ddd...4efb06d](../../compare/ddd5ddd...4efb06d)
+📋 Full Changelog: [fb57195...c24d34d](../../compare/fb57195...c24d34d)
