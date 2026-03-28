@@ -56,10 +56,7 @@ pub fn cfm_stop_entry(
     id: String,
 ) -> Result<RuntimeEntry, String> {
     let id = Uuid::parse_str(&id).map_err(|e| e.to_string())?;
-    let out = state
-        .service()?
-        .stop_entry(id)
-        .map_err(|e| e.to_string())?;
+    let out = state.service()?.stop_entry(id).map_err(|e| e.to_string())?;
     emit_runtime_updated(&app);
     Ok(out)
 }
