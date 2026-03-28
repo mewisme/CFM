@@ -3,6 +3,16 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 import { Download, Plus, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,9 +34,11 @@ import { EntryForm } from "@/features/cfm/entry-form";
 import { CFM_DATABASE_CLEARED_EVENT } from "@/lib/database";
 import {
   buildExportJson,
+  buildImportPlan,
   parseEntriesImportJson,
   readTextFile,
   writeTextFile,
+  type ImportPlan,
 } from "@/lib/entries-import-export";
 import { normalizeTarget, validateEntryForm } from "@/lib/entry-validation";
 import { cn } from "@/lib/utils";
@@ -51,6 +63,8 @@ export default function Home() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(true);
   const [formOpen, setFormOpen] = useState(false);
+  const [importOverwriteOpen, setImportOverwriteOpen] = useState(false);
+  const [pendingImportPlan, setPendingImportPlan] = useState<ImportPlan | null>(null);
 
   function applyRuntimeResult(result: RuntimeEntry): void {
     setRuntime((prev) => ({ ...prev, [result.id]: result }));
@@ -142,6 +156,57 @@ export default function Home() {
     );
   }
 
+  async function applyImportPlan(plan: ImportPlan): Promise<void> {
+    for (const input of plan.toCreate) {
+      await cfmApi.createEntry(input);
+    }
+    for (const { id, input } of plan.toOverwrite) {
+      await cfmApi.updateEntry(id, input);
+    }
+    await refreshEntries();
+  }
+
+  function toastAfterImport(plan: ImportPlan): void {
+    const messages: string[] = [];
+    if (plan.toCreate.length > 0) {
+      messages.push(
+        plan.toCreate.length === 1 ? "Created 1 entry" : `Created ${plan.toCreate.length} entries`,
+      );
+    }
+    if (plan.toOverwrite.length > 0) {
+      messages.push(
+        plan.toOverwrite.length === 1
+          ? "Updated 1 entry"
+          : `Updated ${plan.toOverwrite.length} entries`,
+      );
+    }
+    if (plan.skippedInFile > 0) {
+      messages.push(
+        plan.skippedInFile === 1
+          ? "1 duplicate row skipped in file"
+          : `${plan.skippedInFile} duplicate rows skipped in file`,
+      );
+    }
+    if (messages.length > 0) {
+      toast.success(messages.join(". ") + ".");
+    }
+  }
+
+  async function confirmImportOverwrite(): Promise<void> {
+    const plan = pendingImportPlan;
+    if (!plan) {
+      return;
+    }
+    setImportOverwriteOpen(false);
+    setPendingImportPlan(null);
+    try {
+      await applyImportPlan(plan);
+      toastAfterImport(plan);
+    } catch (error) {
+      toast.error(String(error));
+    }
+  }
+
   async function importEntriesList(): Promise<void> {
     const path = await open({
       title: "Import entries",
@@ -158,13 +223,26 @@ export default function Home() {
       toast.message("No entries in file");
       return;
     }
-    for (const input of inputs) {
-      await cfmApi.createEntry(input);
+    const plan = buildImportPlan(inputs, entries);
+    if (plan.toCreate.length === 0 && plan.toOverwrite.length === 0) {
+      if (plan.skippedInFile > 0) {
+        toast.message(`Nothing to import. ${plan.skippedInFile} duplicate(s) in file.`);
+      } else {
+        toast.message("Nothing to import.");
+      }
+      return;
     }
-    await refreshEntries();
-    toast.success(
-      inputs.length === 1 ? "Imported 1 entry" : `Imported ${inputs.length} entries`,
-    );
+    if (plan.toOverwrite.length > 0) {
+      setPendingImportPlan(plan);
+      setImportOverwriteOpen(true);
+      return;
+    }
+    try {
+      await applyImportPlan(plan);
+      toastAfterImport(plan);
+    } catch (error) {
+      toast.error(String(error));
+    }
   }
 
   async function submitEntry() {
@@ -340,6 +418,51 @@ export default function Home() {
           </Card>
         ) : null}
       </div>
+
+      <AlertDialog
+        open={importOverwriteOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setImportOverwriteOpen(false);
+            setPendingImportPlan(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Overwrite existing entries?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingImportPlan ? (
+                <>
+                  {pendingImportPlan.toOverwrite.length === 1
+                    ? "One route in the file uses the same hostname and target as an entry already in your list."
+                    : `${pendingImportPlan.toOverwrite.length} routes in the file use the same hostname and target as entries already in your list.`}{" "}
+                  {pendingImportPlan.toCreate.length > 0 ? (
+                    <>
+                      {pendingImportPlan.toCreate.length === 1
+                        ? "One new route will be added."
+                        : `${pendingImportPlan.toCreate.length} new routes will be added.`}{" "}
+                    </>
+                  ) : null}
+                  Overwrite matching entries with the values from the file?
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                void confirmImportOverwrite();
+              }}
+            >
+              Overwrite
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

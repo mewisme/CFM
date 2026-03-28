@@ -100,6 +100,58 @@ export function parseEntriesImportJson(raw: string): AccessEntryInput[] {
   return entries.map((item, i) => parseEntryInput(item, i));
 }
 
+/** Stable key for hostname + target (after normalizing target) to detect duplicate routes. */
+export function entryHostnameTargetKey(
+  entry: Pick<AccessEntryInput, "hostname" | "target">,
+): string {
+  const host = entry.hostname.trim().toLowerCase();
+  const target = normalizeTarget(entry.target).trim().toLowerCase();
+  return `${host}\0${target}`;
+}
+
+export interface ImportPlan {
+  toCreate: AccessEntryInput[];
+  /** Existing row ids to replace with imported fields (same hostname + target). */
+  toOverwrite: { id: string; input: AccessEntryInput }[];
+  skippedInFile: number;
+}
+
+/**
+ * First occurrence per hostname+target wins; later rows in the file are counted in `skippedInFile`.
+ * Rows matching an existing entry go to `toOverwrite` instead of `toCreate`.
+ */
+export function buildImportPlan(inputs: AccessEntryInput[], existingEntries: AccessEntry[]): ImportPlan {
+  const existingByKey = new Map<string, AccessEntry>();
+  for (const e of existingEntries) {
+    const k = entryHostnameTargetKey(e);
+    if (!existingByKey.has(k)) {
+      existingByKey.set(k, e);
+    }
+  }
+
+  const seenInImport = new Set<string>();
+  const toCreate: AccessEntryInput[] = [];
+  const toOverwrite: { id: string; input: AccessEntryInput }[] = [];
+  let skippedInFile = 0;
+
+  for (const input of inputs) {
+    const key = entryHostnameTargetKey(input);
+    if (seenInImport.has(key)) {
+      skippedInFile += 1;
+      continue;
+    }
+    seenInImport.add(key);
+    const existing = existingByKey.get(key);
+    if (existing) {
+      toOverwrite.push({ id: existing.id, input });
+    } else {
+      toCreate.push(input);
+    }
+  }
+
+  return { toCreate, toOverwrite, skippedInFile };
+}
+
 export function buildExportJson(entries: AccessEntry[]): string {
   const doc: CfmEntriesExportDocument = {
     format: CFM_ENTRIES_FILE_FORMAT,
