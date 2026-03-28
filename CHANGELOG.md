@@ -2,7 +2,9 @@
 
 🔨 Other Changes
 
-- Bump version to 0.7.2 and update changelog for Lingui integration ([cabd2d7](../../commit/cabd2d7))
+- Enhance localization support with Lingui integration ([c843f3b](../../commit/c843f3b))
+- Add sync-i18n-content skill documentation ([6844146](../../commit/6844146))
+- Update version lock and changelog for 0.7.2 release ([dd2cb86](../../commit/dd2cb86))
 
 
-📋 Full Changelog: [cabd2d7...cabd2d7](../../compare/cabd2d7...cabd2d7)
+📋 Full Changelog: [dd2cb86...c843f3b](../../compare/dd2cb86...c843f3b)
