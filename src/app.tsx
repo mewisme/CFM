@@ -3,7 +3,6 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from "@/components/ui/sonner"
 import Home from './pages/home';
 import { Layout } from './components/layout';
-import Empty from './pages/empty';
 import { Titlebar } from './features/titlebar';
 import { useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
@@ -37,7 +36,6 @@ function App() {
             <Toaster position="bottom-center" richColors offset={50} />
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/empty" element={<Empty />} />
             </Routes>
           </Layout>
         </BrowserRouter>

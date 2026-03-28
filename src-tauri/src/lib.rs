@@ -66,7 +66,10 @@ fn on_secondary_instance_attempt(app: &AppHandle) {
 }
 
 pub fn run() {
-    let mut builder = tauri::Builder::default().plugin(tauri_plugin_positioner::init());
+    let cfm_state = commands::cfm::CfmAppState::default();
+    let mut builder = tauri::Builder::default()
+        .manage(cfm_state.clone())
+        .plugin(tauri_plugin_positioner::init());
 
     // Single Instance must be registered first — see
     // <https://v2.tauri.app/plugin/single-instance/#setup>
@@ -91,12 +94,14 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_notification::init())
-        .setup(|app| {
+        .setup(move |app| {
             let supervisor = Arc::new(process::supervisor::ProcessSupervisor::new(
                 app.handle().clone(),
             ));
             let service = Arc::new(app::service::CfmService::new(supervisor));
-            app.manage(commands::cfm::AppState { service });
+            cfm_state
+                .init(service)
+                .expect("CFM service should initialize exactly once");
             app.manage(ExitCoordinator::new());
 
             let show_item = MenuItemBuilder::with_id("tray_show", "Show/Hide").build(app)?;
@@ -124,8 +129,10 @@ pub fn run() {
                         let handle = app.clone();
                         let coordinator = handle.state::<ExitCoordinator>();
                         coordinator.begin_graceful_exit();
-                        let state = handle.state::<commands::cfm::AppState>();
-                        state.service.shutdown();
+                        let cfm = handle.state::<commands::cfm::CfmAppState>();
+                        if let Ok(svc) = cfm.service() {
+                            svc.shutdown();
+                        }
 
                         if let Some(main) = handle.get_webview_window("main") {
                             let _ = main.close();

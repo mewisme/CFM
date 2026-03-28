@@ -1,5 +1,5 @@
 use std::process::Command;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
@@ -7,8 +7,25 @@ use uuid::Uuid;
 use crate::app::service::CfmService;
 use crate::domain::types::{AccessEntry, RuntimeEntry};
 
-pub struct AppState {
-    pub service: Arc<CfmService>,
+/// Registered with `tauri::Builder::manage` before webviews load; the inner service is set from
+/// `lib::run`'s setup hook (Tauri 2 creates windows before running that hook, so IPC can race otherwise).
+#[derive(Clone, Default)]
+pub struct CfmAppState {
+    service: Arc<OnceLock<Arc<CfmService>>>,
+}
+
+impl CfmAppState {
+    pub fn init(&self, service: Arc<CfmService>) -> Result<(), String> {
+        self.service
+            .set(service)
+            .map_err(|_| "CFM service already initialized".to_string())
+    }
+
+    pub(crate) fn service(&self) -> Result<&Arc<CfmService>, String> {
+        self.service
+            .get()
+            .ok_or_else(|| "CFM service not initialized".to_string())
+    }
 }
 
 fn emit_runtime_updated(app: &AppHandle) {
@@ -18,12 +35,12 @@ fn emit_runtime_updated(app: &AppHandle) {
 #[tauri::command]
 pub fn cfm_start_entry_with_input(
     app: AppHandle,
-    state: State<'_, AppState>,
+    state: State<'_, CfmAppState>,
     entry: AccessEntry,
     cloudflared_path: Option<String>,
 ) -> Result<RuntimeEntry, String> {
     let out = state
-        .service
+        .service()?
         .start_entry_with(entry, cloudflared_path)
         .map_err(|e| e.to_string())?;
     emit_runtime_updated(&app);
@@ -33,11 +50,14 @@ pub fn cfm_start_entry_with_input(
 #[tauri::command]
 pub fn cfm_stop_entry(
     app: AppHandle,
-    state: State<'_, AppState>,
+    state: State<'_, CfmAppState>,
     id: String,
 ) -> Result<RuntimeEntry, String> {
     let id = Uuid::parse_str(&id).map_err(|e| e.to_string())?;
-    let out = state.service.stop_entry(id).map_err(|e| e.to_string())?;
+    let out = state
+        .service()?
+        .stop_entry(id)
+        .map_err(|e| e.to_string())?;
     emit_runtime_updated(&app);
     Ok(out)
 }
@@ -45,12 +65,12 @@ pub fn cfm_stop_entry(
 #[tauri::command]
 pub fn cfm_restart_entry_with_input(
     app: AppHandle,
-    state: State<'_, AppState>,
+    state: State<'_, CfmAppState>,
     entry: AccessEntry,
     cloudflared_path: Option<String>,
 ) -> Result<RuntimeEntry, String> {
     let out = state
-        .service
+        .service()?
         .restart_entry_with(entry, cloudflared_path)
         .map_err(|e| e.to_string())?;
     emit_runtime_updated(&app);
@@ -58,14 +78,17 @@ pub fn cfm_restart_entry_with_input(
 }
 
 #[tauri::command]
-pub fn cfm_runtime_snapshot(state: State<'_, AppState>) -> Result<Vec<RuntimeEntry>, String> {
-    state.service.runtime_snapshot().map_err(|e| e.to_string())
+pub fn cfm_runtime_snapshot(state: State<'_, CfmAppState>) -> Result<Vec<RuntimeEntry>, String> {
+    state
+        .service()?
+        .runtime_snapshot()
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn cfm_entry_logs(state: State<'_, AppState>, id: String) -> Result<Vec<String>, String> {
+pub fn cfm_entry_logs(state: State<'_, CfmAppState>, id: String) -> Result<Vec<String>, String> {
     let id = Uuid::parse_str(&id).map_err(|e| e.to_string())?;
-    state.service.logs(id).map_err(|e| e.to_string())
+    state.service()?.logs(id).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
