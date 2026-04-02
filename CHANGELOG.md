@@ -1,12 +1,12 @@
 ## What's Changed
 
-♻️ Refactoring
+✨ Features
 
-- Remove HTTP access type from application ([7ad05ca](../../commit/7ad05ca))
+- Add minimize to tray functionality ([6cb2882](../../commit/6cb2882))
 
 🔨 Other Changes
 
-- Bump version to 0.8.2 and update changelog for release ([4e4c214](../../commit/4e4c214))
+- Bump version to 0.8.3 and update changelog for release ([8565aae](../../commit/8565aae))
 
 
-📋 Full Changelog: [4e4c214...7ad05ca](../../compare/4e4c214...7ad05ca)
+📋 Full Changelog: [8565aae...6cb2882](../../compare/8565aae...6cb2882)
