@@ -89,7 +89,6 @@ export function SettingsForm(props: {
 
   return (
     <div className="min-w-0 space-y-3">
-
       <div className="min-w-0 space-y-2">
         <div className="text-sm font-medium">
           <Trans>Cloudflared executable</Trans>
@@ -143,6 +142,25 @@ export function SettingsForm(props: {
           <Trans>Start in tray when launched at login</Trans>
         </span>
       </label>
+
+      <label className="flex gap-3 text-sm">
+        <Switch
+          className="mt-0.5 shrink-0"
+          checked={value.minimize_to_tray}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, minimize_to_tray: Boolean(checked) })
+          }
+        />
+        <span className="min-w-0 flex-1 leading-snug">
+          <Trans>Minimize to tray when closing window</Trans>
+        </span>
+      </label>
+      <p className="text-xs text-muted-foreground">
+        <Trans>
+          When off, closing the window quits the app and stops running tunnels. You can still use
+          Quit from the tray icon to exit.
+        </Trans>
+      </p>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="min-w-0 space-y-2">

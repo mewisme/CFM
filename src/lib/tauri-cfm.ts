@@ -32,6 +32,10 @@ export interface RuntimeEntry {
   last_error?: string | null;
 }
 
+export async function syncMinimizeToTrayPreference(enabled: boolean): Promise<void> {
+  await invoke("app_set_minimize_to_tray", { enabled });
+}
+
 export const cfmApi = {
   listEntries: listAccessEntries,
   createEntry: createAccessEntry,
@@ -55,6 +59,7 @@ export const cfmApi = {
   detectCloudflaredPath: () => invoke<string | null>("cfm_detect_cloudflared_path"),
   getSettings: getAppSettings,
   setSettings: setAppSettings,
+  syncMinimizeToTrayPreference,
   onRuntimeUpdated: async (cb: () => void): Promise<UnlistenFn> =>
     listen("cfm://runtime-updated", () => cb()),
 };

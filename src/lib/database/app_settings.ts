@@ -11,6 +11,7 @@ export const APP_SETTING_KEYS = {
   autostart_minimized: "autostart_minimized",
   launch_at_login: "launch_at_login",
   locale: "locale",
+  minimize_to_tray: "minimize_to_tray",
 } as const;
 
 export interface AppSettings {
@@ -19,6 +20,11 @@ export interface AppSettings {
   launch_at_login: boolean;
   /** When true and the app was started by login autostart, main window stays in tray. */
   autostart_minimized: boolean;
+  /**
+   * When true, closing the main window hides it and keeps the app in the tray.
+   * When false, closing quits the app and stops supervised tunnel processes.
+   */
+  minimize_to_tray: boolean;
   /** UI language (BCP-47), persisted; default English. */
   locale: AppLocale;
 }
@@ -43,10 +49,15 @@ export async function getAppSettings(): Promise<AppSettings> {
     `SELECT value FROM ${T} WHERE key = $1`,
     [APP_SETTING_KEYS.locale]
   );
+  const trayRows = await db.select<{ value: string }[]>(
+    `SELECT value FROM ${T} WHERE key = $1`,
+    [APP_SETTING_KEYS.minimize_to_tray]
+  );
   return {
     cloudflared_path: pathRows[0]?.value ?? "",
     launch_at_login: loginRows[0]?.value === "1",
     autostart_minimized: autoRows[0]?.value === "1",
+    minimize_to_tray: trayRows[0]?.value !== "0",
     locale: normalizeAppLocale(localeRows[0]?.value),
   } satisfies AppSettings;
 }
@@ -68,6 +79,10 @@ export async function setAppSettings(settings: AppSettings): Promise<AppSettings
   await db.execute(
     `INSERT INTO ${T} (key, value) VALUES ($1, $2) ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
     [APP_SETTING_KEYS.locale, settings.locale]
+  );
+  await db.execute(
+    `INSERT INTO ${T} (key, value) VALUES ($1, $2) ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    [APP_SETTING_KEYS.minimize_to_tray, settings.minimize_to_tray ? "1" : "0"]
   );
   return settings;
 }

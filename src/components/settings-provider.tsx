@@ -39,6 +39,7 @@ const defaultSettings: AppSettings = {
   cloudflared_path: "",
   launch_at_login: false,
   autostart_minimized: false,
+  minimize_to_tray: true,
   locale: "en",
 };
 
@@ -70,6 +71,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       const merged = await mergeSettingsWithOsAutostart(current);
       setSettings(merged);
       await loadLocaleCatalog(merged.locale);
+      await cfmApi.syncMinimizeToTrayPreference(merged.minimize_to_tray);
       return;
     }
 
@@ -78,6 +80,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       const merged = await mergeSettingsWithOsAutostart(current);
       setSettings(merged);
       await loadLocaleCatalog(merged.locale);
+      await cfmApi.syncMinimizeToTrayPreference(merged.minimize_to_tray);
       toast.error(i18n._(INSTALL_CLOUDFLARED_MESSAGE));
       return;
     }
@@ -91,6 +94,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const mergedNext = await mergeSettingsWithOsAutostart(next);
     setSettings(mergedNext);
     await loadLocaleCatalog(mergedNext.locale);
+    await cfmApi.syncMinimizeToTrayPreference(mergedNext.minimize_to_tray);
   }, []);
 
   const openSettingsDialog = useCallback(() => {
@@ -104,6 +108,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       const merged = await mergeSettingsWithOsAutostart(settings);
       setSettings(merged);
       await loadLocaleCatalog(merged.locale);
+      await cfmApi.syncMinimizeToTrayPreference(merged.minimize_to_tray);
       toast.success(i18n._(msgSettingsSaved));
       setDialogOpen(false);
     } catch (error) {

@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Layout } from "@/components/layout";
 import { Titlebar } from "@/features/titlebar";
 import { getAppSettings, initCfmDatabase } from "@/lib/database";
+import { syncMinimizeToTrayPreference } from "@/lib/tauri-cfm";
 import { loadLocaleCatalog } from "@/lib/load-locale-catalog";
 import Home from "./pages/home";
 
@@ -26,6 +27,7 @@ function App() {
         getAppSettings(),
       ]);
       await loadLocaleCatalog(appSettings.locale);
+      await syncMinimizeToTrayPreference(appSettings.minimize_to_tray);
       if (cancelled) {
         return;
       }

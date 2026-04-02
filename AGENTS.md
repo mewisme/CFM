@@ -76,7 +76,7 @@ src-tauri/src/
 - **`db.ts`** — connection, `getDb`, `initCfmDatabase`, `clearCfmDatabase`; `CFM_DB_URL` must match any `plugins.sql.preload` entry if you add preload back (currently empty so the DB opens on first `getDb`, after `cfm_reconcile_sqlite_files`).
 - **`migration.ts`** — all schema migrations in one place (single file).
 - **`index.ts`** — re-exports only.
-- **One `*.ts` file per table** for CRUD and table-specific types/constants (e.g. `access_entries.ts`, `app_settings.ts`). **`app_settings.ts`** includes **`locale`** (key `locale` in SQLite), among `cloudflared_path`, `launch_at_login`, `autostart_minimized`. Do **not** add extra files here for one-off helpers, migration fragments, or non-table concerns—put those in `migration.ts`, colocate in the table file, or in `lib/` elsewhere.
+- **One `*.ts` file per table** for CRUD and table-specific types/constants (e.g. `access_entries.ts`, `app_settings.ts`). **`app_settings.ts`** includes **`locale`** (key `locale` in SQLite), among `cloudflared_path`, `launch_at_login`, `autostart_minimized`, `minimize_to_tray`. Do **not** add extra files here for one-off helpers, migration fragments, or non-table concerns—put those in `migration.ts`, colocate in the table file, or in `lib/` elsewhere.
 
 ## Internationalization (Lingui)
 
@@ -110,6 +110,7 @@ Registered in `src-tauri/src/lib.rs` via `generate_handler!`.
 | Command | Module | Purpose |
 |--------|--------|---------|
 | `app_is_login_autostart_launch` | `app_env` | `true` when launched with `--cfm-launch-at-login` |
+| `app_set_minimize_to_tray` | `app_env` | Syncs DB-backed “minimize to tray on close” preference to the Rust window/tray handler |
 | `cfm_reconcile_sqlite_files` | `database` | If `cfm.sqlite3` is missing, removes orphan `-wal`/`-shm` so a cold start can create a fresh DB (called before `Database.load` in `getDb`) |
 | `cfm_delete_sqlite_database` | `database` | Deletes SQLite files in app config dir; callers must close the SQL pool first (see `clearCfmDatabase` in `db.ts`) |
 | `cfm_start_entry_with_input` | `cfm` | Start tunnel for an `AccessEntry`; optional `cloudflared_path` |

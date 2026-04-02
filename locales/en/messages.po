@@ -62,24 +62,24 @@ msgstr "Access type"
 msgid "All files"
 msgstr "All files"
 
-#: src/features/cfm/entry-form.tsx:110
+#: src/features/cfm/entry-form.tsx:109
 msgid "Always"
 msgstr "Always"
 
-#: src/features/cfm/settings-form.tsx:150
+#: src/features/cfm/settings-form.tsx:168
 msgid "Appearance"
 msgstr "Appearance"
 
-#: src/components/settings-provider.tsx:150
+#: src/components/settings-provider.tsx:155
 msgid "Application and cloudflared preferences"
 msgstr "Application and cloudflared preferences"
 
-#: src/features/cfm/entry-form.tsx:144
+#: src/features/cfm/entry-form.tsx:143
 msgid "Autostart"
 msgstr "Autostart"
 
 #: src/features/cfm/entries-list.tsx:152
-#: src/features/cfm/settings-form.tsx:236
+#: src/features/cfm/settings-form.tsx:254
 #: src/pages/home.tsx:501
 msgid "Cancel"
 msgstr "Cancel"
@@ -92,15 +92,15 @@ msgstr "CFM update available"
 msgid "Checking for updates..."
 msgstr "Checking for updates..."
 
-#: src/features/cfm/settings-form.tsx:224
+#: src/features/cfm/settings-form.tsx:242
 msgid "Clear all local data?"
 msgstr "Clear all local data?"
 
-#: src/features/cfm/settings-form.tsx:242
+#: src/features/cfm/settings-form.tsx:260
 msgid "Clear data"
 msgstr "Clear data"
 
-#: src/features/cfm/settings-form.tsx:218
+#: src/features/cfm/settings-form.tsx:236
 msgid "Clear local data"
 msgstr "Clear local data"
 
@@ -122,7 +122,7 @@ msgstr "Close form"
 msgid "Cloudflared Access Manager"
 msgstr "Cloudflared Access Manager"
 
-#: src/features/cfm/settings-form.tsx:95
+#: src/features/cfm/settings-form.tsx:94
 msgid "Cloudflared executable"
 msgstr "Cloudflared executable"
 
@@ -134,7 +134,7 @@ msgstr "cloudflared is not detected. Install Cloudflare Tunnel and reopen the ap
 msgid "Create"
 msgstr "Create"
 
-#: src/features/cfm/settings-form.tsx:162
+#: src/features/cfm/settings-form.tsx:180
 msgid "Dark"
 msgstr "Dark"
 
@@ -153,7 +153,7 @@ msgstr "Delete entry?"
 msgid "Downloading update: {0}%"
 msgstr "Downloading update: {0}%"
 
-#: src/features/cfm/entry-form.tsx:172
+#: src/features/cfm/entry-form.tsx:171
 msgid "Edit"
 msgstr "Edit"
 
@@ -161,7 +161,7 @@ msgstr "Edit"
 msgid "Edit entry"
 msgstr "Edit entry"
 
-#: src/features/cfm/entry-form.tsx:135
+#: src/features/cfm/entry-form.tsx:134
 msgid "Enabled"
 msgstr "Enabled"
 
@@ -215,7 +215,7 @@ msgstr "Hide to tray"
 msgid "Hide window to system tray"
 msgstr "Hide window to system tray"
 
-#: src/features/cfm/entry-form.tsx:116
+#: src/features/cfm/entry-form.tsx:115
 msgid "Hostname (example.com)"
 msgstr "Hostname (example.com)"
 
@@ -239,19 +239,19 @@ msgstr "Import entries"
 msgid "JSON"
 msgstr "JSON"
 
-#: src/features/cfm/settings-form.tsx:179
+#: src/features/cfm/settings-form.tsx:197
 msgid "Language"
 msgstr "Language"
 
-#: src/features/cfm/settings-form.tsx:130
+#: src/features/cfm/settings-form.tsx:129
 msgid "Launch at login"
 msgstr "Launch at login"
 
-#: src/features/cfm/settings-form.tsx:159
+#: src/features/cfm/settings-form.tsx:177
 msgid "Light"
 msgstr "Light"
 
-#: src/features/cfm/settings-form.tsx:206
+#: src/features/cfm/settings-form.tsx:224
 msgid "Local data"
 msgstr "Local data"
 
@@ -278,6 +278,10 @@ msgstr "Maximize window"
 msgid "Minimize"
 msgstr "Minimize"
 
+#: src/features/cfm/settings-form.tsx:155
+msgid "Minimize to tray when closing window"
+msgstr "Minimize to tray when closing window"
+
 #: src/features/titlebar/mac-os-buttons.tsx:48
 #: src/features/titlebar/windows-buttons.tsx:39
 msgid "Minimize window"
@@ -291,7 +295,7 @@ msgstr "Name"
 msgid "Name is required."
 msgstr "Name is required."
 
-#: src/features/cfm/entry-form.tsx:104
+#: src/features/cfm/entry-form.tsx:103
 msgid "Never"
 msgstr "Never"
 
@@ -317,7 +321,7 @@ msgstr "Nothing to import."
 msgid "Nothing to import. {0} duplicate(s) in file."
 msgstr "Nothing to import. {0} duplicate(s) in file."
 
-#: src/features/cfm/entry-form.tsx:107
+#: src/features/cfm/entry-form.tsx:106
 msgid "On failure"
 msgstr "On failure"
 
@@ -329,11 +333,11 @@ msgstr "One new route will be added."
 msgid "One route in the file uses the same hostname and target as an entry already in your list."
 msgstr "One route in the file uses the same hostname and target as an entry already in your list."
 
-#: src/features/cfm/entry-form.tsx:153
+#: src/features/cfm/entry-form.tsx:152
 msgid "Opens a separate terminal window for this process (Windows). Changing this requires stopping and starting the tunnel again."
 msgstr "Opens a separate terminal window for this process (Windows). Changing this requires stopping and starting the tunnel again."
 
-#: src/features/cfm/settings-form.tsx:114
+#: src/features/cfm/settings-form.tsx:113
 msgid "Opens the system file dialog. Windows: .exe; other OS: use \"All files\" if needed."
 msgstr "Opens the system file dialog. Windows: .exe; other OS: use \"All files\" if needed."
 
@@ -353,21 +357,21 @@ msgstr "Overwrite matching entries with the values from the file?"
 msgid "Port must be between 1 and 65535."
 msgstr "Port must be between 1 and 65535."
 
-#: src/features/cfm/settings-form.tsx:209
+#: src/features/cfm/settings-form.tsx:227
 msgid "Remove all saved entries and settings from this device and recreate an empty database. Restart the app if tunnels were running."
 msgstr "Remove all saved entries and settings from this device and recreate an empty database. Restart the app if tunnels were running."
 
-#: src/features/cfm/entry-form.tsx:181
+#: src/features/cfm/entry-form.tsx:180
 msgid "Reset"
 msgstr "Reset"
 
 #: src/features/cfm/entries-list.tsx:116
 #: src/features/cfm/entries-list.tsx:117
-#: src/features/cfm/entry-form.tsx:100
+#: src/features/cfm/entry-form.tsx:99
 msgid "Restart"
 msgstr "Restart"
 
-#: src/features/cfm/entry-form.tsx:130
+#: src/features/cfm/entry-form.tsx:129
 msgid "Route options"
 msgstr "Route options"
 
@@ -379,7 +383,7 @@ msgstr "Running"
 msgid "Save"
 msgstr "Save"
 
-#: src/features/cfm/settings-form.tsx:200
+#: src/features/cfm/settings-form.tsx:218
 msgid "Save settings"
 msgstr "Save settings"
 
@@ -388,7 +392,7 @@ msgid "Select cloudflared executable"
 msgstr "Select cloudflared executable"
 
 #: src/components/footer.tsx:25
-#: src/components/settings-provider.tsx:147
+#: src/components/settings-provider.tsx:152
 msgid "Settings"
 msgstr "Settings"
 
@@ -396,7 +400,7 @@ msgstr "Settings"
 msgid "Settings saved"
 msgstr "Settings saved"
 
-#: src/features/cfm/entry-form.tsx:151
+#: src/features/cfm/entry-form.tsx:150
 msgid "Show cloudflared console"
 msgstr "Show cloudflared console"
 
@@ -405,11 +409,11 @@ msgstr "Show cloudflared console"
 msgid "Start"
 msgstr "Start"
 
-#: src/features/cfm/settings-form.tsx:143
+#: src/features/cfm/settings-form.tsx:142
 msgid "Start in tray when launched at login"
 msgstr "Start in tray when launched at login"
 
-#: src/features/cfm/entry-form.tsx:145
+#: src/features/cfm/entry-form.tsx:144
 msgid "Start this tunnel automatically when CFM launches."
 msgstr "Start this tunnel automatically when CFM launches."
 
@@ -434,11 +438,11 @@ msgstr "Stopped"
 msgid "Stopping"
 msgstr "Stopping"
 
-#: src/features/cfm/settings-form.tsx:165
+#: src/features/cfm/settings-form.tsx:183
 msgid "System"
 msgstr "System"
 
-#: src/features/cfm/entry-form.tsx:122
+#: src/features/cfm/entry-form.tsx:121
 msgid "Target (127.0.0.1:3000)"
 msgstr "Target (127.0.0.1:3000)"
 
@@ -454,7 +458,7 @@ msgstr "Target must be a port or host:port (example: 3000 or 127.0.0.1:3000)."
 msgid "Theme"
 msgstr "Theme"
 
-#: src/features/cfm/settings-form.tsx:227
+#: src/features/cfm/settings-form.tsx:245
 msgid "This deletes the tunnel entries and app settings stored in CFM's database on this device. This cannot be undone. If any tunnels are running, close them or restart the app afterward."
 msgstr "This deletes the tunnel entries and app settings stored in CFM's database on this device. This cannot be undone. If any tunnels are running, close them or restart the app afterward."
 
@@ -488,7 +492,11 @@ msgstr "Version {newVersion} is ready. Open the app and click the version in the
 msgid "Version {version}"
 msgstr "Version {version}"
 
-#: src/features/cfm/entry-form.tsx:137
+#: src/features/cfm/settings-form.tsx:159
+msgid "When off, closing the window quits the app and stops running tunnels. You can still use Quit from the tray icon to exit."
+msgstr "When off, closing the window quits the app and stops running tunnels. You can still use Quit from the tray icon to exit."
+
+#: src/features/cfm/entry-form.tsx:136
 msgid "When off, this route is skipped and won’t start with the app."
 msgstr "When off, this route is skipped and won’t start with the app."
 

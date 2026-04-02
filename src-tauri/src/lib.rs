@@ -1,37 +1,37 @@
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::webview::WebviewWindowBuilder;
+use tauri::AppHandle;
 use tauri::Manager;
 use tauri::WindowEvent;
 
 mod app;
 mod commands;
 mod domain;
+mod exit_coordinator;
 mod process;
 
-/// Lets the main webview close during tray quit so WebView2 can tear down before `exit`.
-#[derive(Clone)]
-struct ExitCoordinator {
-    allow_main_close: Arc<AtomicBool>,
-}
+use exit_coordinator::ExitCoordinator;
 
-impl ExitCoordinator {
-    fn new() -> Self {
-        Self {
-            allow_main_close: Arc::new(AtomicBool::new(false)),
-        }
+fn quit_application(app: &AppHandle) {
+    let coordinator = app.state::<ExitCoordinator>();
+    coordinator.begin_graceful_exit();
+    let cfm = app.state::<commands::cfm::CfmAppState>();
+    if let Ok(svc) = cfm.service() {
+        svc.shutdown();
     }
-
-    fn begin_graceful_exit(&self) {
-        self.allow_main_close.store(true, Ordering::SeqCst);
-    }
-
-    fn main_close_allowed(&self) -> bool {
-        self.allow_main_close.load(Ordering::SeqCst)
+    let handle = app.clone();
+    if let Some(main) = app.get_webview_window("main") {
+        let _ = main.close();
+        std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_millis(150));
+            let _ = handle.exit(0);
+        });
+    } else {
+        let _ = app.exit(0);
     }
 }
 
@@ -97,23 +97,7 @@ pub fn run() {
                         }
                     }
                     "tray_quit" => {
-                        let handle = app.clone();
-                        let coordinator = handle.state::<ExitCoordinator>();
-                        coordinator.begin_graceful_exit();
-                        let cfm = handle.state::<commands::cfm::CfmAppState>();
-                        if let Ok(svc) = cfm.service() {
-                            svc.shutdown();
-                        }
-
-                        if let Some(main) = handle.get_webview_window("main") {
-                            let _ = main.close();
-                            std::thread::spawn(move || {
-                                std::thread::sleep(Duration::from_millis(150));
-                                let _ = handle.exit(0);
-                            });
-                        } else {
-                            let _ = handle.exit(0);
-                        }
+                        quit_application(&app);
                     }
                     _ => {}
                 })
@@ -152,12 +136,21 @@ pub fn run() {
                 if allow_close {
                     return;
                 }
-                api.prevent_close();
-                let _ = window.hide();
+                let Some(coordinator) = window.app_handle().try_state::<ExitCoordinator>() else {
+                    return;
+                };
+                if coordinator.minimize_to_tray() {
+                    api.prevent_close();
+                    let _ = window.hide();
+                } else {
+                    api.prevent_close();
+                    quit_application(window.app_handle());
+                }
             }
         })
         .invoke_handler(tauri::generate_handler![
             commands::app_env::app_is_login_autostart_launch,
+            commands::app_env::app_set_minimize_to_tray,
             commands::database::cfm_reconcile_sqlite_files,
             commands::database::cfm_delete_sqlite_database,
             commands::cfm::cfm_start_entry_with_input,
